@@ -34,6 +34,7 @@
         <a href="#install">Install</a>
         <a href="#features">Features</a>
         <a href="#preview">Preview</a>
+        <a href="docs.html">Docs</a>
         <a href="#about">About</a>
         <a href="https://github.com/yourhandle/jugaad-code" target="_blank" rel="noopener noreferrer" class="nav-link-git">GitHub</a>
       </nav>
@@ -101,48 +102,45 @@
       </div>
     </section>
 
-    <!-- Terminal Preview -->
+    <!-- Terminal Preview matching user screenshot -->
     <section class="section" id="preview">
-      <h2 class="section-heading">Command Output</h2>
-      <div class="terminal-container">
-        <div class="terminal-header">
-          <div class="terminal-tabs">
-            <button class="t-tab active" data-view="doctor">/doctor</button>
-            <button class="t-tab" data-view="pk">/pk on</button>
-            <button class="t-tab" data-view="checkpoint">/checkpoint</button>
-          </div>
-          <span class="terminal-meta">Claude Code Extension</span>
+      <h2 class="section-heading">Live Terminal Interface</h2>
+      <div class="real-terminal-frame">
+        <div class="real-term-top">
+          <div class="real-term-cmd">Ran 1 shell command</div>
         </div>
-        <pre class="terminal-body" id="terminalOutput">
-══════════════════════════════════════
-  jugaad-code Developer Health Report
-══════════════════════════════════════
-POWER
-Status   : AC Connected (Bijli mojood hai)
-Battery  : 100%
-Remaining: N/A
-
-SURVIVAL MODE : NORMAL
-Protections   : normal_operation, background_guardian_active
-
-INTERNET
-GitHub        : OK [118ms] (SMW4/AAE-1)
-NPM Registry  : OK [182ms] (SMW4)
-Claude API    : OK [210ms] (SMW4/AAE-1)
-PyPI          : OK [145ms] (SMW4)
-
-ISP
-Detected : PTCL Broadband (Islamabad, Pakistan)
-Quirks   : Heavy SMW4 dependence, GitHub slow after 9pm PKT
-
-DIAGNOSIS
-ALL_OK — Local gateway and international routes are healthy.
-
-RECOMMENDATION
-Submarine cables are clear. If package installs fail, check your code.
-
-"Barkat hai, submarine cable theek hai aaj. Kaam karo."
-══════════════════════════════════════</pre>
+        <div class="real-term-body">
+          <div class="real-term-line pk-active-title">
+            <span class="green-dot"></span>
+            <span>Pakistan Mode: ACTIVE</span>
+          </div>
+          <div class="real-term-divider"></div>
+          <div class="real-term-text">
+            <div>Guardian daemon running</div>
+            <div>NPM -> Asian mirror</div>
+            <div>PIP -> Asian mirror</div>
+            <div>Theme -> green/white (Jugaad PK)</div>
+            <div>Auto-checkpoint: every 5 min</div>
+            <div>Bijli detection: ON</div>
+            <br>
+            <div>Theek hai. Kaam karo.</div>
+          </div>
+          <div class="real-term-divider"></div>
+        </div>
+        <div class="real-term-bottom">
+          <div class="prompt-line">
+            <span class="prompt-arrow">&gt;</span>
+            <span class="prompt-text">yes, delete it</span>
+          </div>
+          <div class="statusline-bar">
+            <span class="status-state">[PK: NET DEGRADED]</span>
+            <span class="status-text">Load shedding schedule check kiya?</span>
+          </div>
+          <div class="status-sub">
+            <span class="bypass-text">&#9658;&#9658; bypass permissions on (shift+tab to cycle)</span>
+            <span class="agent-hint">&middot; &larr; for agents</span>
+          </div>
+        </div>
       </div>
     </section>
 

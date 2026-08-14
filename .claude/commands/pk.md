@@ -28,9 +28,9 @@ Theek hai. Kaam karo.
 ```
 
 Note: the theme writes to your user settings and applies to all projects.
-This build of Claude Code picks up theme changes on restart. To switch
-colors instantly without restarting, type `/config theme=custom:pk`
-(or `/theme`) in the input — that applies immediately.
+Custom themes cannot be set via /config (built-in themes only). To switch
+colors instantly, type /theme and pick "Pakistan Green" — it applies
+immediately. Otherwise the change applies on the next restart.
 
 If argument is "off":
 1. Kill the guardian using its pidfile: read `~/.jugaad-code/guardian.pid` and stop that process (Windows: `taskkill /F /PID <pid>`, otherwise `kill <pid>`).

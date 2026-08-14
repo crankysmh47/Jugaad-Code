@@ -278,60 +278,188 @@ body {
   line-height: 1.5;
 }
 
-/* Terminal Container */
-.terminal-container {
-  background: #0F172A;
-  border: 1px solid #1E293B;
+/* Realistic Terminal Frame (Matching Claude Code terminal) */
+.real-terminal-frame {
+  background: #0B0F0D;
+  border: 1px solid #1E2922;
   border-radius: 6px;
   overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.terminal-header {
+.real-term-top {
+  padding: 16px 20px 10px 20px;
+}
+
+.real-term-cmd {
+  color: #00E676;
+  font-size: 0.88rem;
+  font-weight: 500;
+}
+
+.real-term-body {
+  padding: 0 20px 16px 20px;
+}
+
+.real-term-line.pk-active-title {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: #1E293B;
-  padding: 8px 14px;
+  gap: 8px;
+  color: #FFFFFF;
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 6px;
 }
 
-.terminal-tabs {
+.green-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #00E676;
+}
+
+.real-term-divider {
+  height: 1px;
+  background: #FFFFFF;
+  margin: 6px 0 10px 0;
+  max-width: 320px;
+}
+
+.real-term-text {
+  color: #E2E8F0;
+  line-height: 1.55;
+  font-size: 0.88rem;
+}
+
+.real-term-bottom {
+  border-top: 1.5px solid #00E676;
+  padding: 12px 20px 14px 20px;
+  background: #070B09;
+}
+
+.prompt-line {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
 }
 
-.t-tab {
-  background: transparent;
-  border: none;
+.prompt-arrow {
   color: #94A3B8;
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  padding: 4px 8px;
-  border-radius: 3px;
-  cursor: pointer;
-  transition: all 0.15s ease;
+  font-weight: bold;
 }
 
-.t-tab.active {
-  background: #334155;
-  color: #F8FAFC;
+.prompt-text {
+  color: #94A3B8;
+}
+
+.statusline-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.status-state {
+  color: #2DD4BF;
   font-weight: 600;
 }
 
-.terminal-meta {
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
-  color: #64748B;
+.status-text {
+  color: #E2E8F0;
 }
 
-.terminal-body {
-  padding: 16px 18px;
-  color: #E2E8F0;
+.status-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+}
+
+.bypass-text {
+  color: #00E676;
+}
+
+.agent-hint {
+  color: #94A3B8;
+}
+
+/* Docs Specific Styles */
+.docs-body {
+  padding-bottom: 20px;
+}
+
+.docs-subheading {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+.doc-block {
+  margin-bottom: 28px;
+  background: #FAFAFA;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 18px 20px;
+}
+
+.doc-cmd-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.doc-cmd-header code {
   font-family: var(--font-mono);
-  font-size: 0.82rem;
-  line-height: 1.5;
-  margin: 0;
-  overflow-x: auto;
-  white-space: pre-wrap;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pk-green);
+}
+
+.doc-tag {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.doc-block p {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin-bottom: 10px;
+}
+
+.doc-block ul {
+  padding-left: 20px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.doc-block li {
+  margin-bottom: 6px;
+}
+
+.doc-block code {
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  background: #FFFFFF;
+  border: 1px solid var(--border);
+  padding: 2px 5px;
+  border-radius: 3px;
+  color: var(--text-main);
 }
 
 /* About Content */

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation — jugaad-code</title>
+  <meta name="description" content="Complete documentation and technical reference for jugaad-code resilience layer.">
+
+  <!-- Google Fonts: Caveat & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="page-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand">
+        <a href="index.html" class="brand-title" style="text-decoration:none;">jugaad-code</a>
+        <span class="brand-script">Docs</span>
+      </div>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="#quickstart">Quickstart</a>
+        <a href="#commands">Commands</a>
+        <a href="#survival">Survival Engine</a>
+        <a href="https://github.com/yourhandle/jugaad-code" target="_blank" rel="noopener noreferrer" class="nav-link-git">GitHub</a>
+      </nav>
+    </header>
+
+    <main class="docs-body">
+      <!-- Quickstart Section -->
+      <section class="section" id="quickstart">
+        <h1 class="hero-title" style="font-size: 1.9rem; margin-bottom: 8px;">Documentation & Technical Guide</h1>
+        <p class="hero-desc">
+          Everything you need to configure, extend, and run <strong>jugaad-code</strong> with Claude Code on Windows, macOS, and Linux.
+        </p>
+
+        <h3 class="docs-subheading">Installation</h3>
+        <p>Run the one-command installer in your shell. It downloads the resilience scripts to <code>~/.jugaad-code/</code>, copies slash commands to <code>~/.claude/commands/</code>, and merges hook configurations into <code>~/.claude/settings.json</code>:</p>
+
+        <div class="install-box" style="margin-top: 14px;">
+          <div class="install-tabs">
+            <button class="tab-btn active" data-os="win">Windows (PowerShell)</button>
+            <button class="tab-btn" data-os="nix">Linux / macOS / WSL</button>
+          </div>
+          <div class="install-command-wrap">
+            <code id="cmdText">irm https://raw.githubusercontent.com/yourhandle/jugaad-code/main/install.ps1 | iex</code>
+            <button id="copyBtn" class="copy-btn">Copy</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Commands Reference -->
+      <section class="section" id="commands">
+        <h2 class="section-heading">Slash Commands Reference</h2>
+        
+        <div class="doc-block">
+          <div class="doc-cmd-header">
+            <code>/doctor</code>
+            <span class="doc-tag">Full Health Check</span>
+          </div>
+          <p>Runs a complete diagnostic scan of your developer environment:</p>
+          <ul>
+            <li><strong>Power Status</strong>: Queries WMI (Windows) or psutil (Linux/macOS) for AC connection, battery %, and remaining runtime.</li>
+            <li><strong>Internet Diagnostics</strong>: Tests DNS latency, TCP handshake, and TTFB against GitHub, NPM registry, PyPI, and Anthropic API.</li>
+            <li><strong>ISP Fingerprinting</strong>: Detects provider (PTCL, StormFiber, Nayatel, Jazz, Zong) and flags known routing issues.</li>
+            <li><strong>Root-Cause Analysis</strong>: Categorizes issues into <code>LOCAL_NETWORK</code>, <code>SUBMARINE_CABLE</code>, <code>ISP_ROUTING</code>, or <code>ALL_OK</code>.</li>
+          </ul>
+        </div>
+
+        <div class="doc-block">
+          <div class="doc-cmd-header">
+            <code>/pk on</code> | <code>/pk off</code> | <code>/pk status</code>
+            <span class="doc-tag">Pakistan Mode Toggle</span>
+          </div>
+          <p>Controls the background guardian daemon, mirror routing, and terminal theme:</p>
+          <ul>
+            <li><code>/pk on</code>: Starts the background guardian daemon, switches npm to <code>registry.npmmirror.com</code>, switches pip to <code>pypi.tuna.tsinghua.edu.cn</code>, and enables the Pakistan Green theme.</li>
+            <li><code>/pk off</code>: Gracefully stops the guardian process, restores default npm/pip registries, and reverts your original theme.</li>
+            <li><code>/pk status</code>: Reports current guardian PID, state cache freshness, active theme, and mirror settings.</li>
+          </ul>
+        </div>
+
+        <div class="doc-block">
+          <div class="doc-cmd-header">
+            <code>/checkpoint</code>
+            <span class="doc-tag">Emergency Git Commit</span>
+          </div>
+          <p>Scans the current repository for modified/untracked files and creates an atomic git checkpoint commit (<code>chore: [PK-checkpoint] manual @ ...</code>) so work is never lost.</p>
+        </div>
+      </section>
+
+      <!-- Survival Mode Engine -->
+      <section class="section" id="survival">
+        <h2 class="section-heading">Adaptive Survival Mode Engine</h2>
+        <p>jugaad-code continuously updates a lightweight local state cache (<code>~/.jugaad-code/state.json</code>) across 4 operational states:</p>
+
+        <div class="grid-features" style="margin-top: 18px;">
+          <div class="feature-item">
+            <h3>NORMAL</h3>
+            <p>Stable AC power and low international latency. No restrictions or rerouting applied.</p>
+          </div>
+
+          <div class="feature-item">
+            <h3>NETWORK DEGRADED</h3>
+            <p>High international latency (>3000ms) or cable disruption. Automatically routes installs through Asian mirrors and prefers local package cache.</p>
+          </div>
+
+          <div class="feature-item">
+            <h3>POWER UNSTABLE</h3>
+            <p>AC power loss detected. Workspace auto-checkpoint commits on state change, and warnings appear before long-running build tasks.</p>
+          </div>
+
+          <div class="feature-item">
+            <h3>CRITICAL</h3>
+            <p>Battery under 15% during network instability. Restricts non-essential operations, triggers immediate commits, and protects unsaved edits.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Architecture & Hooks -->
+      <section class="section" id="architecture">
+        <h2 class="section-heading">Hook Architecture</h2>
+        <p>Claude Code executes cross-platform Python hooks before and after tool calls:</p>
+        <ul>
+          <li><strong>Pre-Tool Hook</strong> (<code>scripts/pre_tool_hook.py</code>): Reads state cache in &lt;5ms. Warns on degraded infrastructure and auto-commits when battery is low.</li>
+          <li><strong>Post-Tool Hook</strong> (<code>scripts/post_tool_hook.py</code>): Intercepts failures (<code>ECONNREFUSED</code>, timeouts) and translates them to human Roman Urdu explanations.</li>
+          <li><strong>Statusline</strong> (<code>scripts/statusline.py</code>): Dynamically injects the current survival state and rotating desi humor into Claude Code’s status bar.</li>
+        </ul>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div><a href="index.html" style="color:var(--text-dim); text-decoration:none;">← Back to Home</a></div>
+      <div class="footer-note">jugaad-code Docs • Open Source</div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
