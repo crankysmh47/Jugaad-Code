@@ -41,5 +41,5 @@ If argument is "off":
 If argument is "status":
 - Guardian running? (pidfile exists and the process is alive)
 - Current survival state from `~/.jugaad-code/state.json` if fresh (< 90s)
-- Theme active? (user settings `theme` equals `custom:jugaadi-pk`)
+- Theme active? (user settings `theme` equals `custom:pk`)
 - Current npm registry and pip index-url
