@@ -18,27 +18,27 @@ PREV_FILE = os.path.join(STATE_DIR, "prev-theme.json")
 
 THEME_SLUG = "custom:jugaadi-pk"
 
-# Green and white on a LIGHT (white) base. The Claude accent ("claude"
-# token) becomes green, body text dark green-black, background white.
-# Error stays red for signal.
+# Monochrome green on a white base. Every token is a shade of green —
+# no reds, no yellows, no orange. Darkest greens for text, mid greens
+# for accents and statuses, pale greens for backgrounds.
 PK_THEME = {
     "name": "Jugaadi PK",
     "base": "light",
     "overrides": {
         "claude": "#1d9a56",
         "claudeShimmer": "#6fcf97",
-        "text": "#14201a",
-        "inverseText": "#ffffff",
-        "subtle": "#5a7263",
-        "inactive": "#93ab9d",
+        "text": "#0e2417",
+        "inverseText": "#e9f7ee",
+        "subtle": "#4a6b57",
+        "inactive": "#8fae9b",
         "suggestion": "#145c33",
         "permission": "#1d9a56",
         "permissionShimmer": "#6fcf97",
         "remember": "#1d9a56",
-        "success": "#145c33",
-        "error": "#d64545",
-        "warning": "#9a7b00",
-        "warningShimmer": "#c9ae4d",
+        "success": "#1d9a56",
+        "error": "#0f5f36",
+        "warning": "#3f7d55",
+        "warningShimmer": "#8fc9a6",
         "promptBorder": "#1d9a56",
         "promptBorderShimmer": "#6fcf97",
         "planMode": "#1d9a56",
@@ -49,9 +49,9 @@ PK_THEME = {
         "fastModeShimmer": "#6fcf97",
         "inactiveShimmer": "#6fcf97",
         "diffAdded": "#1d9a56",
-        "diffRemoved": "#d64545",
+        "diffRemoved": "#4a8a63",
         "diffAddedDimmed": "#d4eddd",
-        "diffRemovedDimmed": "#f6dddd",
+        "diffRemovedDimmed": "#c7e0d1",
         "userMessageBackground": "#f4f8f5",
         "userMessageBackgroundHover": "#e9f1eb",
         "bashMessageBackgroundColor": "#eef4ef",

@@ -4,6 +4,7 @@
 Spawns the guardian as a DETACHED process so it survives the Claude Code
 session that started it — no OS-level startup script needed.
 """
+import ctypes
 import os
 import subprocess
 import sys
@@ -14,14 +15,31 @@ LOG_FILE = os.path.join(STATE_DIR, "guardian.log")
 GUARDIAN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guardian.py")
 
 
+def _pid_alive_windows(pid):
+    # os.kill(pid, 0) is NOT an existence check on Windows — it terminates.
+    # OpenProcess with query-only access is the safe way.
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    try:
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, int(pid))
+        if not handle:
+            return False
+        kernel32.CloseHandle(handle)
+        return True
+    except Exception:
+        return False
+
+
 def guardian_alive():
     try:
         with open(PID_FILE, "r") as fh:
             pid = int(fh.read().strip())
     except (OSError, ValueError):
         return False
+    if os.name == "nt":
+        return _pid_alive_windows(pid)
     try:
-        os.kill(pid, 0)
+        os.kill(pid, 0)  # POSIX: signal 0 is a safe existence check
         return True
     except OSError:
         return False

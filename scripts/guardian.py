@@ -183,6 +183,22 @@ def check_survival_mode():
         return "UNKNOWN", {}
 
 
+def _pid_alive_windows(pid):
+    # os.kill(pid, 0) is NOT an existence check on Windows — it terminates.
+    # OpenProcess with query-only access is the safe way.
+    PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+    try:
+        import ctypes
+        kernel32 = ctypes.windll.kernel32
+        handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, int(pid))
+        if not handle:
+            return False
+        kernel32.CloseHandle(handle)
+        return True
+    except Exception:
+        return False
+
+
 def already_running():
     try:
         with open(PID_FILE, "r") as fh:
@@ -191,8 +207,10 @@ def already_running():
         return False
     if pid == os.getpid():
         return False
+    if os.name == "nt":
+        return _pid_alive_windows(pid)
     try:
-        os.kill(pid, 0)  # signal 0 = existence check; works on Windows
+        os.kill(pid, 0)  # POSIX: signal 0 is a safe existence check
         return True
     except OSError:
         return False
