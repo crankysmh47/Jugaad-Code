@@ -27,9 +27,10 @@ Theek hai. Kaam karo.
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-Note: the theme applies to all projects and reloads live. If the
-`~/.claude/themes` folder was just created for the first time, one
-Claude Code restart is needed for theme files to be picked up.
+Note: the theme writes to your user settings and applies to all projects.
+This build of Claude Code picks up theme changes on restart. To switch
+colors instantly without restarting, type `/config theme=custom:pk`
+(or `/theme`) in the input — that applies immediately.
 
 If argument is "off":
 1. Kill the guardian using its pidfile: read `~/.jugaad-code/guardian.pid` and stop that process (Windows: `taskkill /F /PID <pid>`, otherwise `kill <pid>`).
