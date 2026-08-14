@@ -20,6 +20,10 @@ ERROR_MAP = {
         "en": "Connection timed out",
         "pk": "Time out ho gaya. Submarine cable issue ho sakta hai. /doctor chalao."
     },
+    "timeout": {
+        "en": "Operation timed out",
+        "pk": "Time out ho gaya. Submarine cable issue ho sakta hai. /doctor chalao."
+    },
     "npm ERR! code E404": {
         "en": "Package not found",
         "pk": "Package nahi mila. Naam theek likha hai? ya mirror pe nahi hai."

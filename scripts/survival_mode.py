@@ -97,17 +97,10 @@ def evaluate():
 
 def print_human(result):
     state = result["state"]
-    icons = {
-        STATE_NORMAL: "✓",
-        STATE_NETWORK: "🌐",
-        STATE_POWER: "⚡",
-        STATE_CRITICAL: "🚨"
-    }
-
-    print(f"{icons.get(state, '?')} jugaadi-claude state: {state}")
-    print("Actions:")
+    print(f"jugaadi-claude state: {state}")
+    print("Active protections:")
     for action in result["actions"]:
-        print(f"  • {action}")
+        print(f"  - {action}")
 
 
 if __name__ == "__main__":
