@@ -1,7 +1,9 @@
 # install.ps1 — Windows PowerShell setup for jugaadi-claude
 
-Write-Host "🇵🇰 Installing jugaadi-claude — Pakistan Resilience Layer for Claude Code (Windows)" -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
+Write-Host "Installing jugaadi-claude - Pakistan Resilience Layer for Claude Code (Windows)" -ForegroundColor Cyan
+Write-Host "=================================================================" -ForegroundColor DarkGray
 
 # Check Python
 $pythonCmd = Get-Command python -ErrorAction SilentlyContinue
@@ -10,7 +12,7 @@ if (-not $pythonCmd) {
 }
 
 if (-not $pythonCmd) {
-    Write-Host "❌ Python not found in PATH. Install Python 3 first." -ForegroundColor Red
+    Write-Host "[Error] Python not found in PATH. Install Python 3 first." -ForegroundColor Red
     exit 1
 }
 
@@ -40,13 +42,13 @@ $scriptsPath = (Join-Path (Get-Location) "scripts")
 $env:JUGAADI_CLAUDE_SCRIPTS = $scriptsPath
 
 Write-Host ""
-Write-Host "✅ jugaadi-claude installed successfully!" -ForegroundColor Green
+Write-Host "[OK] jugaadi-claude installed successfully!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Commands available in Claude Code:"
-Write-Host "  /doctor     — Full health check"
-Write-Host "  /pk on      — Activate Pakistan Mode"
-Write-Host "  /pk off     — Deactivate Pakistan Mode"
-Write-Host "  /checkpoint — Emergency commit"
+Write-Host "  /doctor     - Full health check"
+Write-Host "  /pk on      - Activate Pakistan Mode"
+Write-Host "  /pk off     - Deactivate Pakistan Mode"
+Write-Host "  /checkpoint - Emergency commit"
 Write-Host ""
 Write-Host "Theek hai. Kaam shuru karo." -ForegroundColor Cyan
-Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor DarkGray
+Write-Host "=================================================================" -ForegroundColor DarkGray
