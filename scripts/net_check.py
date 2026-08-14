@@ -90,7 +90,7 @@ def ttfb(url, timeout=5):
     try:
         req = urllib.request.Request(
             url,
-            headers={"User-Agent": "Mozilla/5.0 (compatible; jugaadi-claude/1.0)"}
+            headers={"User-Agent": "Mozilla/5.0 (compatible; jugaad-code/1.0)"}
         )
         resp = urllib.request.urlopen(req, timeout=timeout)
         resp.read(1)

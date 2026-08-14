@@ -31,7 +31,7 @@ def run_script(name, *args):
 
 def main():
     print("=" * 55)
-    print("  jugaadi-claude Developer Health Report")
+    print("  🇵🇰 jugaad-code Developer Health Report")
     print("=" * 55)
 
     print("\n[1/4] Checking Power & Bijli Status...")

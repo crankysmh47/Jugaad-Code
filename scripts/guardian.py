@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.dirname(SCRIPT_DIR))
 
 from ui.messages import get_message
 
-STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaad-code")
 PID_FILE = os.path.join(STATE_DIR, "guardian.pid")
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
 LOG_FILE = os.path.join(STATE_DIR, "guardian.log")
@@ -36,7 +36,7 @@ def ensure_state_dir():
 
 def log(msg):
     ts = datetime.now().strftime("%H:%M:%S")
-    line = f"[jugaadi-claude {ts}] {msg}"
+    line = f"[jugaad-code {ts}] {msg}"
     print(line, flush=True)
     try:
         ensure_state_dir()
@@ -217,13 +217,14 @@ def already_running():
 
 
 def run():
-    global last_power_state
+    global last_power_state, last_network
     if already_running():
         print("Guardian already running (pidfile). Exiting.", flush=True)
         return
     write_pidfile()
     atexit.register(remove_pidfile)
-    log("jugaadi-claude Guardian started. Pakistan mode active.")
+    log("jugaad-code Guardian started. Pakistan mode active.")
+    msg_index = 0
 
     while True:
         try:

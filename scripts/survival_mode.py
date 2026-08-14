@@ -97,7 +97,7 @@ def evaluate():
 
 def print_human(result):
     state = result["state"]
-    print(f"jugaadi-claude state: {state}")
+    print(f"jugaad-code state: {state}")
     print("Active protections:")
     for action in result["actions"]:
         print(f"  - {action}")

@@ -9,7 +9,7 @@ import os
 import subprocess
 import sys
 
-STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaad-code")
 PID_FILE = os.path.join(STATE_DIR, "guardian.pid")
 LOG_FILE = os.path.join(STATE_DIR, "guardian.log")
 GUARDIAN = os.path.join(os.path.dirname(os.path.abspath(__file__)), "guardian.py")

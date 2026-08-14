@@ -1,7 +1,7 @@
 # scripts/cache_reader.py
 """
-Fast cached state reader for jugaadi-claude hooks and statusline.
-Reads ~/.jugaadi-claude/state.json written by guardian.py daemon.
+Fast cached state reader for jugaad-code hooks and statusline.
+Reads ~/.jugaad-code/state.json written by guardian.py daemon.
 Falls back to quick local evaluation if cache is absent.
 """
 import os
@@ -9,7 +9,7 @@ import sys
 import json
 import time
 
-STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaad-code")
 STATE_FILE = os.path.join(STATE_DIR, "state.json")
 
 def get_cached_state(max_age_seconds=120):
