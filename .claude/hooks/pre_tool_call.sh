@@ -10,8 +10,9 @@ else
     PY="python"
 fi
 
-# Cache-first state read; power-only fallback when the cache is stale
-LINE=$("$PY" "$SCRIPT_DIR/cache_reader.py" 2>/dev/null)
+# Cache-first state read; power-only fallback when the cache is stale.
+# cache_reader.py prints JSON — flatten it to "STATE ON_AC PCT" here.
+LINE=$("$PY" "$SCRIPT_DIR/cache_reader.py" 2>/dev/null | "$PY" -c "import json,sys; d=json.loads(sys.stdin.read()); p=d.get('power',{}); print(d.get('state','NONE'), str(p.get('on_ac',True)).lower(), p.get('battery_percent',100))" 2>/dev/null)
 read -r STATE ON_AC PCT <<< "$LINE"
 if [[ -z "$STATE" ]]; then
     STATE="NONE"; ON_AC="true"; PCT="100"

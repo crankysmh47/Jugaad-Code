@@ -24,10 +24,10 @@ def render_statusline():
     state = cache.get("state", "NORMAL")
     
     icons = {
-        "NORMAL": "[PK: NORMAL ✓]",
-        "NETWORK_DEGRADED": "[PK: NET DEGRADED 🌐]",
-        "POWER_UNSTABLE": "[PK: POWER UNSTABLE ⚡]",
-        "CRITICAL": "[PK: CRITICAL 🚨]"
+        "NORMAL": "[PK: NORMAL]",
+        "NETWORK_DEGRADED": "[PK: NET DEGRADED]",
+        "POWER_UNSTABLE": "[PK: POWER UNSTABLE]",
+        "CRITICAL": "[PK: CRITICAL]"
     }
     
     prefix = icons.get(state, "[PK]")

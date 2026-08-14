@@ -972,6 +972,114 @@ section {
   user-select: none;
 }
 
+/* About Section */
+.about-section {
+  padding-top: 50px;
+}
+
+.about-container {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.about-card-main {
+  background: linear-gradient(135deg, rgba(1, 65, 28, 0.7) 0%, rgba(2, 26, 13, 0.9) 100%);
+  border: 1px solid var(--pk-green-mint);
+  border-radius: var(--radius-lg);
+  padding: 35px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 25px var(--pk-green-glow);
+  backdrop-filter: blur(20px);
+}
+
+.about-crest {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: var(--pk-green-deep);
+  border: 2px solid #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 20px var(--pk-green-mint);
+}
+
+.about-symbol {
+  font-size: 2.2rem;
+  color: #FFFFFF;
+}
+
+.about-main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.about-heading {
+  font-family: var(--font-urdu-eng);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.about-main-content p {
+  font-size: 1.02rem;
+  color: var(--pk-white-pearl);
+  line-height: 1.6;
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.about-subcard {
+  background: var(--pk-dark-card);
+  border: 1px solid var(--pk-dark-border);
+  border-radius: var(--radius-md);
+  padding: 26px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(15px);
+}
+
+.about-subcard:hover {
+  border-color: var(--pk-green-mint);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 15px var(--pk-green-glow);
+}
+
+.about-sub-icon {
+  font-size: 1.8rem;
+  margin-bottom: 12px;
+}
+
+.about-subcard h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  margin-bottom: 8px;
+}
+
+.about-subcard p {
+  font-size: 0.9rem;
+  color: var(--pk-white-muted);
+  line-height: 1.55;
+}
+
+.about-subcard code {
+  color: var(--pk-green-mint);
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+}
+
 /* Footer */
 .site-footer {
   background: rgba(1, 20, 9, 0.95);
