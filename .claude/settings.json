@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python \"${JUGAADI_CLAUDE_SCRIPTS:-${CLAUDE_PROJECT_DIR:-$PWD}/scripts}/guardian_boot.py\"",
+            "command": "python \"${JUGAAD_CODE_SCRIPTS:-${CLAUDE_PROJECT_DIR:-$PWD}/scripts}/guardian_boot.py\"",
             "timeout": 10
           }
         ]
@@ -18,9 +18,9 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${JUGAADI_CLAUDE_SCRIPTS:-$PWD//\\\\//}/../.claude/hooks/pre_tool_call.sh\"",
+            "command": "python \"${JUGAAD_CODE_SCRIPTS:-${CLAUDE_PROJECT_DIR:-$PWD}/scripts}/pre_tool_hook.py\"",
             "timeout": 15,
-            "statusMessage": "jugaadi soch raha hai..."
+            "statusMessage": "jugaad soch raha hai..."
           }
         ]
       }
@@ -31,7 +31,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${JUGAADI_CLAUDE_SCRIPTS:-$PWD//\\\\//}/../.claude/hooks/post_tool_call.sh\"",
+            "command": "python \"${JUGAAD_CODE_SCRIPTS:-${CLAUDE_PROJECT_DIR:-$PWD}/scripts}/post_tool_hook.py\"",
             "timeout": 15
           }
         ]
@@ -40,7 +40,7 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "python \"${JUGAADI_CLAUDE_SCRIPTS:-${CLAUDE_PROJECT_DIR:-$PWD}/scripts}/statusline.py\"",
+    "command": "python \"${JUGAAD_CODE_SCRIPTS:-${CLAUDE_PROJECT_DIR:-$PWD}/scripts}/statusline.py\"",
     "padding": 1,
     "refreshInterval": 30
   }

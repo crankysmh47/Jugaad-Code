@@ -43,12 +43,9 @@ if (Test-Path "ui") {
     Copy-Item -Path "ui\*" -Destination $appUiDir -Recurse -Force
 }
 
-# Copy slash commands and hooks
+# Copy slash commands
 if (Test-Path ".claude\commands") {
     Copy-Item -Path ".claude\commands\*" -Destination $claudeCommandsDir -Force
-}
-if (Test-Path ".claude\hooks") {
-    Copy-Item -Path ".claude\hooks\*" -Destination $claudeHooksDir -Force
 }
 
 # Set Environment Variables
@@ -64,7 +61,6 @@ if (Test-Path $settingsPath) {
     try {
         $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json -AsHashtable
     } catch {
-        Write-Host "[Warning] Existing settings.json could not be parsed - initializing fresh." -ForegroundColor Yellow
         $settings = @{}
     }
 }
@@ -78,7 +74,7 @@ $settings["hooks"] = @{
             hooks = @(
                 @{
                     type = "command"
-                    command = 'bash "$HOME/.claude/hooks/pre_tool_call.sh"'
+                    command = 'python "${JUGAAD_CODE_SCRIPTS}/pre_tool_hook.py"'
                     timeout = 15
                     statusMessage = "jugaad soch raha hai..."
                 }
@@ -91,7 +87,7 @@ $settings["hooks"] = @{
             hooks = @(
                 @{
                     type = "command"
-                    command = 'bash "$HOME/.claude/hooks/post_tool_call.sh"'
+                    command = 'python "${JUGAAD_CODE_SCRIPTS}/post_tool_hook.py"'
                     timeout = 15
                 }
             )

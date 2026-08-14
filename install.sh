@@ -43,10 +43,6 @@ fi
 if [ -d ".claude/commands" ]; then
     cp .claude/commands/* "$CLAUDE_COMMANDS_DIR/"
 fi
-if [ -d ".claude/hooks" ]; then
-    cp .claude/hooks/* "$CLAUDE_HOOKS_DIR/"
-    chmod +x "$CLAUDE_HOOKS_DIR/"*.sh 2>/dev/null || true
-fi
 
 # Export environment variable in shell rc
 for rc in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
@@ -79,7 +75,7 @@ settings["hooks"] = {
             "hooks": [
                 {
                     "type": "command",
-                    "command": "bash \"$HOME/.claude/hooks/pre_tool_call.sh\"",
+                    "command": 'python "\${JUGAAD_CODE_SCRIPTS}/pre_tool_hook.py"',
                     "timeout": 15,
                     "statusMessage": "jugaad soch raha hai..."
                 }
@@ -92,7 +88,7 @@ settings["hooks"] = {
             "hooks": [
                 {
                     "type": "command",
-                    "command": "bash \"$HOME/.claude/hooks/post_tool_call.sh\"",
+                    "command": 'python "\${JUGAAD_CODE_SCRIPTS}/post_tool_hook.py"',
                     "timeout": 15
                 }
             ]
