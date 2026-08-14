@@ -1,10 +1,12 @@
 # scripts/net_check.py
-import socket
-import time
-import urllib.request
-import urllib.error
 import json
+import random
+import socket
+import struct
 import sys
+import time
+import urllib.error
+import urllib.request
 
 ENDPOINTS = {
     "github.com": {
@@ -28,12 +30,12 @@ ENDPOINTS = {
         "critical": True
     },
     "1.1.1.1": {
-        "url": "https://1.1.1.1",
+        "kind": "dns_resolver",
         "cable": "LOCAL",
         "critical": True
     },
     "8.8.8.8": {
-        "url": "https://8.8.8.8",
+        "kind": "dns_resolver",
         "cable": "LOCAL",
         "critical": False
     }
@@ -49,6 +51,27 @@ def dns_resolve(host, timeout=3):
         start = time.time()
         socket.setdefaulttimeout(timeout)
         socket.gethostbyname(host)
+        return round((time.time() - start) * 1000, 1)
+    except:
+        return None
+
+def dns_query_ms(resolver, query_host="github.com", timeout=3):
+    """Send a real DNS A query to a resolver over UDP 53 and time it."""
+    try:
+        txid = random.randint(0, 65535)
+        header = struct.pack(">HHHHHH", txid, 0x0100, 1, 0, 0, 0)
+        qname = b"".join(
+            bytes([len(label)]) + label.encode() for label in query_host.split(".")
+        ) + b"\x00"
+        question = qname + struct.pack(">HH", 1, 1)
+        packet = header + question
+
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.settimeout(timeout)
+        start = time.time()
+        sock.sendto(packet, (resolver, 53))
+        sock.recvfrom(512)
+        sock.close()
         return round((time.time() - start) * 1000, 1)
     except:
         return None
@@ -85,9 +108,22 @@ def diagnose():
     total_international = 0
 
     for host, meta in ENDPOINTS.items():
-        is_local = meta["cable"] == "LOCAL"
-        if not is_local:
-            total_international += 1
+        # DNS resolvers get a real UDP 53 query, not a TCP 443 probe
+        if meta.get("kind") == "dns_resolver":
+            dns_ms = dns_query_ms(host)
+            results[host] = {
+                "dns_ms": dns_ms,
+                "tcp_ms": None,
+                "ttfb_ms": None,
+                "status": "ok" if dns_ms is not None else "dns_fail",
+                "cable": meta["cable"],
+                "critical": meta["critical"]
+            }
+            if dns_ms is None:
+                failed_local += 1
+            continue
+
+        total_international += 1
 
         dns_ms = dns_resolve(host)
         tcp_ms = tcp_connect(host) if dns_ms else None
@@ -96,18 +132,13 @@ def diagnose():
         status = "ok"
         if dns_ms is None:
             status = "dns_fail"
-            if not is_local: failed_international += 1
+            failed_international += 1
         elif tcp_ms is None:
             status = "tcp_fail"
-            if not is_local: failed_international += 1
+            failed_international += 1
         elif ttfb_ms is None or ttfb_ms > 3000:
             status = "slow"
-            if not is_local: failed_international += 1
-        elif not is_local and failed_local == 0:
-            pass
-
-        if is_local and dns_ms is None:
-            failed_local += 1
+            failed_international += 1
 
         results[host] = {
             "dns_ms": dns_ms,

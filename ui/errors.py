@@ -57,5 +57,6 @@ if __name__ == "__main__":
     result = translate_error(error)
     if result:
         print(result)
-    else:
-        print(f"[jugaadi-claude] Kuch toh gadbad hai: {error}")
+        sys.exit(0)
+    # No known pattern: stay silent so callers (hooks) can stay quiet too
+    sys.exit(1)

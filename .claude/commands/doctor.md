@@ -1,7 +1,7 @@
 ---
 description: Full Pakistan-aware developer environment health check
 model: claude-sonnet-4-6
-allowed-tools: Bash
+allowed-tools: Bash, PowerShell
 ---
 
 Run a full environment health check for Pakistani developer conditions.
@@ -15,34 +15,34 @@ Steps:
 
 ```
 ══════════════════════════════════════
-  🇵🇰 jugaadi-claude Developer Health Report
+  jugaadi-claude Developer Health Report
 ══════════════════════════════════════
-⚡ POWER
+POWER
 Status   : [AC Connected / On Battery/UPS]
 Battery  : [X]%
 Remaining: [X] minutes
 
-🛡️ SURVIVAL MODE : [NORMAL / NETWORK DEGRADED / POWER UNSTABLE / CRITICAL]
-Actions          : [Current adaptive protections]
+SURVIVAL MODE : [NORMAL / NETWORK DEGRADED / POWER UNSTABLE / CRITICAL]
+Protections   : [Current adaptive protections]
 
-🌐 INTERNET
-GitHub        : [✓ OK / ✗ SLOW / ✗ DOWN] [Xms]
-NPM Registry  : [✓ OK / ✗ SLOW / ✗ DOWN] [Xms]
-Claude API    : [✓ OK / ✗ SLOW / ✗ DOWN] [Xms]
-PyPI          : [✓ OK / ✗ SLOW / ✗ DOWN] [Xms]
+INTERNET
+GitHub        : [OK / SLOW / DOWN] [Xms]
+NPM Registry  : [OK / SLOW / DOWN] [Xms]
+Claude API    : [OK / SLOW / DOWN] [Xms]
+PyPI          : [OK / SLOW / DOWN] [Xms]
 
-📡 ISP
+ISP
 Detected : [ISP Name]
 City     : [City]
 Issues   : [Known issues for this ISP]
 
-🩺 DIAGNOSIS
+DIAGNOSIS
 [SUBMARINE_CABLE / ISP_ROUTING / LOCAL_NETWORK / ALL_OK]
 
-💊 RECOMMENDATION
+RECOMMENDATION
 [Specific actionable recommendation]
 
-⚙️  ACTIONS TAKEN
+ACTIONS TAKEN
 [List any mirrors switched, commits made, etc.]
 ══════════════════════════════════════
 ```

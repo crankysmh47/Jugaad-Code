@@ -1,5 +1,7 @@
 #!/bin/bash
 # .claude/hooks/post_tool_call.sh
+# After a failed Bash/PowerShell tool call, translate known network
+# and packaging errors into something a Pakistani dev can act on.
 TOOL_NAME=$1
 EXIT_CODE=$2
 OUTPUT=$3
@@ -12,21 +14,18 @@ else
     PY="python"
 fi
 
-if [[ "$TOOL_NAME" == "Bash" || "$TOOL_NAME" == "bash" ]] && [[ "$EXIT_CODE" != "0" ]]; then
-    if echo "$OUTPUT" | grep -qiE "timeout|ECONNREFUSED|ENOTFOUND|network|npm ERR|pip.*error"; then
+case "$TOOL_NAME" in
+    Bash|bash|PowerShell|powershell) ;;
+    *) exit 0 ;;
+esac
+
+if [[ "$EXIT_CODE" != "0" ]]; then
+    # errors.py prints a translated line only for known patterns and
+    # stays silent otherwise
+    TRANSLATED=$("$PY" "$SCRIPT_DIR/../ui/errors.py" "$OUTPUT" 2>/dev/null)
+    if [[ -n "$TRANSLATED" ]]; then
         echo ""
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-        echo "🇵🇰 [jugaadi-claude] Yeh aapka code nahi hai."
-        echo "   Network issue lag raha hai. Diagnose kar raha hoon..."
-        
-        DIAG=$($PY "$SCRIPT_DIR/net_check.py" 2>/dev/null | \
-            $PY -c "import sys,json; d=json.load(sys.stdin); print(d.get('diagnosis','UNKNOWN'))" 2>/dev/null)
-        REC=$($PY "$SCRIPT_DIR/net_check.py" 2>/dev/null | \
-            $PY -c "import sys,json; d=json.load(sys.stdin); print(d.get('recommendation','Check network.'))" 2>/dev/null)
-        
-        echo "   Diagnosis: $DIAG"
-        echo "   → $REC"
-        echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+        echo "$TRANSLATED"
     fi
 fi
 

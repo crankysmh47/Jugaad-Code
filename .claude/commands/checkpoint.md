@@ -11,5 +11,5 @@ Immediately checkpoint all uncommitted work.
    - `git add -A`
    - `git commit -m "chore: [PK-checkpoint] manual @ $(date '+%Y-%m-%d %H:%M')"`
    - Report what was committed
-3. If clean: report "Sab theek hai — kuch commit karne ki zaroorat nahi."
+3. If clean: report "Sab theek hai, kuch commit karne ki zaroorat nahi."
 4. Optionally run `git push` if remote is configured and internet is healthy.

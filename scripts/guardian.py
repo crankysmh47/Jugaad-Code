@@ -1,9 +1,10 @@
 # scripts/guardian.py
-import time
+import atexit
+import json
+import os
 import subprocess
 import sys
-import os
-import json
+import time
 from datetime import datetime
 
 if hasattr(sys.stdout, "reconfigure"):
@@ -12,33 +13,86 @@ if hasattr(sys.stdout, "reconfigure"):
     except Exception:
         pass
 
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, os.path.dirname(SCRIPT_DIR))
+
+from ui.messages import get_message
+
+STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+PID_FILE = os.path.join(STATE_DIR, "guardian.pid")
+STATE_FILE = os.path.join(STATE_DIR, "state.json")
+LOG_FILE = os.path.join(STATE_DIR, "guardian.log")
+
 CHECK_INTERVAL = 60  # seconds
 COMMIT_INTERVAL = 300  # auto-commit every 5 min if dirty
 last_commit_time = 0
 last_power_state = True  # assume AC on start
+last_network = {"diagnosis": "ALL_OK", "recommendation": ""}
 
-PK_MESSAGES = [
-    "Bijli watch karna ho raha hai...",
-    "Internet check ho raha hai...",
-    "Code safe hai. Abhi tak.",
-    "Submarine cable theek hai.",
-    "Guardian jaag raha hai.",
-]
+
+def ensure_state_dir():
+    os.makedirs(STATE_DIR, exist_ok=True)
+
 
 def log(msg):
     ts = datetime.now().strftime("%H:%M:%S")
-    print(f"[jugaadi-claude {ts}] {msg}", flush=True)
+    line = f"[jugaadi-claude {ts}] {msg}"
+    print(line, flush=True)
+    try:
+        ensure_state_dir()
+        with open(LOG_FILE, "a", encoding="utf-8") as fh:
+            fh.write(f"{datetime.now().strftime('%Y-%m-%d')} {line}\n")
+    except Exception:
+        pass
+
+
+def write_pidfile():
+    ensure_state_dir()
+    with open(PID_FILE, "w") as fh:
+        fh.write(str(os.getpid()))
+
+
+def remove_pidfile():
+    try:
+        if os.path.exists(PID_FILE):
+            os.remove(PID_FILE)
+    except Exception:
+        pass
+
+
+def write_state_cache(state, power, network):
+    try:
+        ensure_state_dir()
+        payload = {
+            "state": state,
+            "power": {
+                "on_ac": power.get("on_ac", True),
+                "battery_percent": power.get("battery_percent", 100),
+            },
+            "network": {
+                "diagnosis": network.get("diagnosis", "ALL_OK"),
+                "recommendation": network.get("recommendation", ""),
+            },
+            "updated_at": time.time(),
+            "guardian_pid": os.getpid(),
+        }
+        with open(STATE_FILE, "w", encoding="utf-8") as fh:
+            json.dump(payload, fh, indent=2)
+    except Exception:
+        pass
+
 
 def get_power():
     try:
         result = subprocess.run(
-            [sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "power_check.py")],
+            [sys.executable, os.path.join(SCRIPT_DIR, "power_check.py")],
             capture_output=True, text=True, timeout=10
         )
         data = json.loads(result.stdout)
         return data.get("on_ac", True), data.get("battery_percent", 100)
-    except:
+    except Exception:
         return True, 100
+
 
 def is_git_dirty():
     try:
@@ -47,8 +101,9 @@ def is_git_dirty():
             capture_output=True, text=True, timeout=5
         )
         return bool(result.stdout.strip())
-    except:
+    except Exception:
         return False
+
 
 def emergency_commit(reason="power-cut"):
     if not is_git_dirty():
@@ -64,6 +119,7 @@ def emergency_commit(reason="power-cut"):
         log(f"Commit failed: {e}")
         return False
 
+
 def auto_commit():
     global last_commit_time
     now = time.time()
@@ -75,45 +131,47 @@ def auto_commit():
             subprocess.run(["git", "commit", "-m", msg], timeout=10)
             last_commit_time = now
             log("Auto-checkpoint committed.")
-        except:
+        except Exception:
             pass
+
 
 def check_net_and_switch():
     try:
         result = subprocess.run(
-            [sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "net_check.py")],
+            [sys.executable, os.path.join(SCRIPT_DIR, "net_check.py")],
             capture_output=True, text=True, timeout=30
         )
         data = json.loads(result.stdout)
         diagnosis = data.get("diagnosis", "ALL_OK")
-        
+
         if diagnosis in ["SUBMARINE_CABLE", "ISP_ROUTING"]:
             mirrors = data.get("mirrors", {})
             if mirrors.get("npm"):
                 subprocess.run(
-                    [sys.executable, 
-                     os.path.join(os.path.dirname(os.path.abspath(__file__)), "mirror_switch.py"),
+                    [sys.executable,
+                     os.path.join(SCRIPT_DIR, "mirror_switch.py"),
                      "npm", mirrors["npm"]],
                     timeout=10
                 )
                 log(f"Network degraded ({diagnosis}). Switched npm to Asian mirror.")
             if mirrors.get("pip"):
                 subprocess.run(
-                    [sys.executable, 
-                     os.path.join(os.path.dirname(os.path.abspath(__file__)), "mirror_switch.py"),
+                    [sys.executable,
+                     os.path.join(SCRIPT_DIR, "mirror_switch.py"),
                      "pip", mirrors["pip"]],
                     timeout=10
                 )
                 log(f"Network degraded ({diagnosis}). Switched pip to Asian mirror.")
-        
-        return diagnosis
-    except:
-        return "UNKNOWN"
+
+        return data
+    except Exception:
+        return {"diagnosis": "UNKNOWN", "recommendation": ""}
+
 
 def check_survival_mode():
     try:
         result = subprocess.run(
-            [sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), "survival_mode.py"), "--json"],
+            [sys.executable, os.path.join(SCRIPT_DIR, "survival_mode.py"), "--json"],
             capture_output=True, text=True, timeout=35
         )
         data = json.loads(result.stdout)
@@ -124,10 +182,12 @@ def check_survival_mode():
         log(f"Survival state check failed: {e}")
         return "UNKNOWN", {}
 
+
 def run():
     global last_power_state
+    write_pidfile()
+    atexit.register(remove_pidfile)
     log("jugaadi-claude Guardian started. Pakistan mode active.")
-    msg_index = 0
 
     while True:
         try:
@@ -135,9 +195,9 @@ def run():
             on_ac, pct = get_power()
 
             if last_power_state and not on_ac:
-                log(f"⚡ BIJLI GONE! Battery: {pct}%. Emergency commit...")
+                log(f"Power cut detected. Battery at {pct}%. Taking an emergency checkpoint...")
                 emergency_commit("bijli-cut")
-            
+
             last_power_state = on_ac
 
             # Auto-commit on a schedule
@@ -145,31 +205,35 @@ def run():
 
             # Net check every 5 cycles
             if int(time.time() / CHECK_INTERVAL) % 5 == 0:
-                diagnosis = check_net_and_switch()
-                log(f"Net: {diagnosis}")
+                last_network = check_net_and_switch()
+                log(f"Net: {last_network.get('diagnosis')}")
 
             # Adaptive survival mode
             state, survival = check_survival_mode()
 
             if state == "CRITICAL":
-                log("🚨 CRITICAL: protect work, checkpoint now, avoid long operations.")
+                log("Critical state: checkpoint your work and avoid long operations.")
             elif state == "POWER_UNSTABLE":
-                log("⚡ POWER UNSTABLE: workspace protection active.")
+                log("Power unstable: workspace protection active.")
             elif state == "NETWORK_DEGRADED":
-                log("🌐 NETWORK DEGRADED: cache/mirror/retry behavior active.")
+                log("Network degraded: cache, mirrors and retries active.")
+
+            # State cache for hooks and statusline
+            write_state_cache(state, {"on_ac": on_ac, "battery_percent": pct}, last_network)
 
             # Rotating message
-            log(PK_MESSAGES[msg_index % len(PK_MESSAGES)])
-            msg_index += 1
+            log(get_message())
 
             time.sleep(CHECK_INTERVAL)
 
         except KeyboardInterrupt:
             log("Guardian stopped. Allah hafiz.")
+            remove_pidfile()
             sys.exit(0)
         except Exception as e:
             log(f"Error: {e}")
             time.sleep(CHECK_INTERVAL)
+
 
 if __name__ == "__main__":
     run()
