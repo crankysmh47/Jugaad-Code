@@ -1,149 +1,104 @@
 # scripts/theme_switch.py
-"""Toggle the green/white Jugaadi PK theme for Claude Code (user-level).
-
-on  : installs ~/.claude/themes/jugaadi-pk.json and points settings.json at it
-off : restores the previous theme value (or removes the theme key)
 """
-import json
+Manages the Pakistan Green & White theme for Claude Code.
+Switches user theme in ~/.claude/settings.json and ~/.claude/themes/pk.json.
+"""
 import os
 import sys
+import json
 
-HOME = os.path.expanduser("~")
-CLAUDE_DIR = os.path.join(HOME, ".claude")
+CLAUDE_DIR = os.path.join(os.path.expanduser("~"), ".claude")
 THEMES_DIR = os.path.join(CLAUDE_DIR, "themes")
-THEME_FILE = os.path.join(THEMES_DIR, "jugaadi-pk.json")
 SETTINGS_FILE = os.path.join(CLAUDE_DIR, "settings.json")
-STATE_DIR = os.path.join(HOME, ".jugaadi-claude")
-PREV_FILE = os.path.join(STATE_DIR, "prev-theme.json")
+BACKUP_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+BACKUP_FILE = os.path.join(BACKUP_DIR, "previous_theme.txt")
 
-THEME_SLUG = "custom:jugaadi-pk"
-
-# Monochrome green on a white base. Every token is a shade of green —
-# no reds, no yellows, no orange. Darkest greens for text, mid greens
-# for accents and statuses, pale greens for backgrounds.
-PK_THEME = {
-    "name": "Jugaadi PK",
-    "base": "light",
-    "overrides": {
-        "claude": "#1d9a56",
-        "claudeShimmer": "#6fcf97",
-        "text": "#0e2417",
-        "inverseText": "#e9f7ee",
-        "subtle": "#4a6b57",
-        "inactive": "#8fae9b",
-        "suggestion": "#145c33",
-        "permission": "#1d9a56",
-        "permissionShimmer": "#6fcf97",
-        "remember": "#1d9a56",
-        "success": "#1d9a56",
-        "error": "#0f5f36",
-        "warning": "#3f7d55",
-        "warningShimmer": "#8fc9a6",
-        "promptBorder": "#1d9a56",
-        "promptBorderShimmer": "#6fcf97",
-        "planMode": "#1d9a56",
-        "autoAccept": "#1d9a56",
-        "bashBorder": "#158a4e",
-        "ide": "#1d9a56",
-        "fastMode": "#1d9a56",
-        "fastModeShimmer": "#6fcf97",
-        "inactiveShimmer": "#6fcf97",
-        "diffAdded": "#1d9a56",
-        "diffRemoved": "#4a8a63",
-        "diffAddedDimmed": "#d4eddd",
-        "diffRemovedDimmed": "#c7e0d1",
-        "userMessageBackground": "#f4f8f5",
-        "userMessageBackgroundHover": "#e9f1eb",
-        "bashMessageBackgroundColor": "#eef4ef",
-        "memoryBackgroundColor": "#f4f8f5",
-        "selectionBg": "#d9ecdf",
-    },
+PK_THEME_DEF = {
+    "name": "Pakistan Green",
+    "type": "dark",
+    "colors": {
+        "primary": "#01411C",
+        "secondary": "#00A859",
+        "background": "#0A140D",
+        "foreground": "#FFFFFF",
+        "accent": "#00FF66",
+        "highlight": "#118032",
+        "muted": "#7A9E82",
+        "border": "#004D26",
+        "success": "#00E676",
+        "warning": "#FFD600",
+        "error": "#FF5252"
+    }
 }
 
+def ensure_dirs():
+    os.makedirs(THEMES_DIR, exist_ok=True)
+    os.makedirs(BACKUP_DIR, exist_ok=True)
 
 def load_settings():
-    """Return (settings_dict, parse_error). Never clobber an invalid file."""
-    if not os.path.exists(SETTINGS_FILE):
-        return {}, None
-    try:
-        with open(SETTINGS_FILE, "r", encoding="utf-8") as fh:
-            return json.load(fh), None
-    except (json.JSONDecodeError, OSError) as e:
-        return None, f"settings.json could not be parsed: {e}"
+    if os.path.exists(SETTINGS_FILE):
+        try:
+            with open(SETTINGS_FILE, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
+    return {}
 
+def save_settings(data):
+    os.makedirs(CLAUDE_DIR, exist_ok=True)
+    with open(SETTINGS_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2)
 
-def save_settings(settings):
-    with open(SETTINGS_FILE, "w", encoding="utf-8") as fh:
-        json.dump(settings, fh, indent=2)
-        fh.write("\n")
+def set_theme_on():
+    ensure_dirs()
+    # Write pk theme file
+    pk_theme_file = os.path.join(THEMES_DIR, "pk.json")
+    with open(pk_theme_file, "w", encoding="utf-8") as f:
+        json.dump(PK_THEME_DEF, f, indent=2)
 
+    settings = load_settings()
+    current_theme = settings.get("theme", "default")
+    
+    # Only backup if not already pk
+    if current_theme != "pk":
+        with open(BACKUP_FILE, "w", encoding="utf-8") as f:
+            f.write(str(current_theme))
 
-def theme_on():
-    first_run = not os.path.isdir(THEMES_DIR)
-    os.makedirs(THEMES_DIR, exist_ok=True)
-    os.makedirs(STATE_DIR, exist_ok=True)
-
-    settings, err = load_settings()
-    if err:
-        return {"switched": False, "error": err}
-
-    prev = settings.get("theme")
-    with open(PREV_FILE, "w", encoding="utf-8") as fh:
-        json.dump({"theme": prev, "existed": "theme" in settings}, fh, indent=2)
-
-    with open(THEME_FILE, "w", encoding="utf-8") as fh:
-        json.dump(PK_THEME, fh, indent=2)
-        fh.write("\n")
-
-    settings["theme"] = THEME_SLUG
+    settings["theme"] = "pk"
     save_settings(settings)
+    return {"status": "ACTIVE", "theme": "pk", "previous": current_theme}
 
+def set_theme_off():
+    ensure_dirs()
+    prev = "default"
+    if os.path.exists(BACKUP_FILE):
+        try:
+            with open(BACKUP_FILE, "r", encoding="utf-8") as f:
+                prev = f.read().strip() or "default"
+        except Exception:
+            prev = "default"
+    
+    settings = load_settings()
+    settings["theme"] = prev
+    save_settings(settings)
+    return {"status": "INACTIVE", "theme": prev}
+
+def get_status():
+    settings = load_settings()
+    theme = settings.get("theme", "default")
     return {
-        "switched": True,
-        "theme": THEME_SLUG,
-        "previous": prev,
-        "settings": SETTINGS_FILE,
-        "first_run": first_run,
+        "active": theme == "pk",
+        "theme": theme
     }
 
-
-def theme_off():
-    settings, err = load_settings()
-    if err:
-        return {"switched": False, "error": err}
-
-    prev = None
-    existed = False
-    if os.path.exists(PREV_FILE):
-        try:
-            with open(PREV_FILE, "r", encoding="utf-8") as fh:
-                backup = json.load(fh)
-            prev = backup.get("theme")
-            existed = backup.get("existed", False)
-        except (json.JSONDecodeError, OSError):
-            pass
-
-    if existed and prev:
-        settings["theme"] = prev
-    else:
-        settings.pop("theme", None)
-
-    save_settings(settings)
-    try:
-        if os.path.exists(PREV_FILE):
-            os.remove(PREV_FILE)
-    except OSError:
-        pass
-
-    return {"switched": True, "theme": prev, "settings": SETTINGS_FILE}
-
-
 if __name__ == "__main__":
-    action = sys.argv[1] if len(sys.argv) > 1 else "on"
+    action = sys.argv[1] if len(sys.argv) > 1 else "status"
     if action == "on":
-        result = theme_on()
+        res = set_theme_on()
+        print(json.dumps(res, indent=2))
     elif action == "off":
-        result = theme_off()
+        res = set_theme_off()
+        print(json.dumps(res, indent=2))
     else:
-        result = {"switched": False, "error": "Usage: theme_switch.py <on|off>"}
-    print(json.dumps(result, indent=2))
+        res = get_status()
+        print(json.dumps(res, indent=2))

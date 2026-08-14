@@ -1,61 +1,51 @@
 # scripts/cache_reader.py
-"""Fast state reader for hooks: prints 'state on_ac battery_pct' on one line.
-
-Uses the guardian's state cache when fresh (< 90s). When the cache is
-stale or missing, falls back to a quick live power probe only — no
-network checks, so tool calls never stall on a slow probe.
 """
-import json
+Fast cached state reader for jugaadi-claude hooks and statusline.
+Reads ~/.jugaadi-claude/state.json written by guardian.py daemon.
+Falls back to quick local evaluation if cache is absent.
+"""
 import os
-import subprocess
 import sys
+import json
 import time
 
-if hasattr(sys.stdout, "reconfigure"):
+STATE_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+STATE_FILE = os.path.join(STATE_DIR, "state.json")
+
+def get_cached_state(max_age_seconds=120):
+    if os.path.exists(STATE_FILE):
+        try:
+            mtime = os.path.getmtime(STATE_FILE)
+            if time.time() - mtime < max_age_seconds:
+                with open(STATE_FILE, "r", encoding="utf-8") as f:
+                    return json.load(f)
+        except Exception:
+            pass
+
+    # Quick fallback if cache is missing or stale
     try:
-        sys.stdout.reconfigure(encoding="utf-8")
-    except Exception:
-        pass
-
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-STATE_FILE = os.path.join(os.path.expanduser("~"), ".jugaadi-claude", "state.json")
-FRESH_WINDOW = 90  # seconds
-
-
-def read_cache():
-    try:
-        with open(STATE_FILE, "r", encoding="utf-8") as fh:
-            return json.load(fh)
-    except Exception:
-        return None
-
-
-def main():
-    cache = read_cache()
-    if cache and time.time() - cache.get("updated_at", 0) < FRESH_WINDOW:
-        power = cache.get("power", {})
-        print(
-            cache.get("state", "NONE"),
-            str(power.get("on_ac", True)).lower(),
-            power.get("battery_percent", 100),
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        import subprocess
+        res = subprocess.run(
+            [sys.executable, os.path.join(script_dir, "power_check.py")],
+            capture_output=True, text=True, timeout=3
         )
-        return
-
-    # Stale or missing: quick power-only probe
-    try:
-        result = subprocess.run(
-            [sys.executable, os.path.join(SCRIPT_DIR, "power_check.py")],
-            capture_output=True, text=True, timeout=8,
-        )
-        data = json.loads(result.stdout)
-        print(
-            "NONE",
-            str(data.get("on_ac", True)).lower(),
-            data.get("battery_percent", 100),
-        )
+        p_data = json.loads(res.stdout) if res.stdout.strip() else {}
+        on_ac = p_data.get("on_ac", True)
+        return {
+            "state": "NORMAL" if on_ac else "POWER_UNSTABLE",
+            "power": p_data,
+            "network": {"diagnosis": "ALL_OK"},
+            "cached": False,
+            "timestamp": time.time()
+        }
     except Exception:
-        print("NONE true 100")
-
+        return {
+            "state": "NORMAL",
+            "power": {"on_ac": True, "battery_percent": 100},
+            "network": {"diagnosis": "ALL_OK"},
+            "cached": False
+        }
 
 if __name__ == "__main__":
-    main()
+    print(json.dumps(get_cached_state(), indent=2))
