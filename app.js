@@ -8,8 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const tTabs = document.querySelectorAll('.t-tab');
 
   const COMMANDS = {
-    win: 'irm https://raw.githubusercontent.com/yourhandle/jugaad-code/main/install.ps1 | iex',
-    nix: 'curl -fsSL https://raw.githubusercontent.com/yourhandle/jugaad-code/main/install.sh | bash'
+    win: 'irm https://raw.githubusercontent.com/crankysmh47/Jugaad-Code/main/install.ps1 | iex',
+    nix: 'curl -fsSL https://raw.githubusercontent.com/crankysmh47/Jugaad-Code/main/install.sh | bash'
   };
 
   const TERMINAL_VIEWS = {

@@ -63,8 +63,8 @@ CRITICAL
 
 ### Windows (PowerShell):
 ```powershell
-git clone https://github.com/yourhandle/jugaad-code
-cd jugaad-code
+git clone https://github.com/crankysmh47/Jugaad-Code
+cd Jugaad-Code
 .\install.ps1
 ```
 
@@ -74,8 +74,8 @@ config into `~/.claude/settings.json` (existing keys are preserved).
 
 ### Linux / macOS / WSL:
 ```bash
-git clone https://github.com/yourhandle/jugaad-code
-cd jugaad-code
+git clone https://github.com/crankysmh47/Jugaad-Code
+cd Jugaad-Code
 bash install.sh
 ```
 
