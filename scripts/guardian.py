@@ -183,8 +183,26 @@ def check_survival_mode():
         return "UNKNOWN", {}
 
 
+def already_running():
+    try:
+        with open(PID_FILE, "r") as fh:
+            pid = int(fh.read().strip())
+    except (OSError, ValueError):
+        return False
+    if pid == os.getpid():
+        return False
+    try:
+        os.kill(pid, 0)  # signal 0 = existence check; works on Windows
+        return True
+    except OSError:
+        return False
+
+
 def run():
     global last_power_state
+    if already_running():
+        print("Guardian already running (pidfile). Exiting.", flush=True)
+        return
     write_pidfile()
     atexit.register(remove_pidfile)
     log("jugaadi-claude Guardian started. Pakistan mode active.")
