@@ -49,7 +49,7 @@ ERROR_MAP = {
 def translate_error(error_text):
     for key, val in ERROR_MAP.items():
         if key.lower() in error_text.lower():
-            return f"[jugaadi-claude] {val['pk']}"
+            return f"[jugaad-code] {val['pk']}"
     return None
 
 if __name__ == "__main__":
@@ -58,5 +58,7 @@ if __name__ == "__main__":
     if result:
         print(result)
         sys.exit(0)
+    else:
+        print(f"[jugaad-code] Kuch toh gadbad hai: {error}")
     # No known pattern: stay silent so callers (hooks) can stay quiet too
     sys.exit(1)

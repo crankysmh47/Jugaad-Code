@@ -10,7 +10,7 @@ import json
 CLAUDE_DIR = os.path.join(os.path.expanduser("~"), ".claude")
 THEMES_DIR = os.path.join(CLAUDE_DIR, "themes")
 SETTINGS_FILE = os.path.join(CLAUDE_DIR, "settings.json")
-BACKUP_DIR = os.path.join(os.path.expanduser("~"), ".jugaadi-claude")
+BACKUP_DIR = os.path.join(os.path.expanduser("~"), ".jugaad-code")
 BACKUP_FILE = os.path.join(BACKUP_DIR, "previous_theme.txt")
 
 PK_THEME_DEF = {
