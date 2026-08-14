@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jugaad-code 🇵🇰 — Claude Code, Raised in Pakistan</title>
+  <meta name="description" content="A resilience layer for Claude Code designed for Pakistani developers. Handles load-shedding, submarine cable cuts, ISP routing quirks, and mirrors automatically.">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Amita:wght@700&family=Cinzel+Decorative:wght@700;900&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Rozha+One&family=Nastaliq+Urdu&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%2301411C%22 rx=%2220%22/><circle cx=%2254%22 cy=%2250%22 r=%2226%22 fill=%22%23FFFFFF%22/><circle cx=%2261%22 cy=%2244%22 r=%2223%22 fill=%22%2301411C%22/><polygon points=%2260,28 63,37 72,37 65,43 68,52 60,46 52,52 55,43 48,37 57,37%22 fill=%22%23FFFFFF%22/></svg>">
+</head>
+<body>
+
+  <!-- Subtle Pakistan Flag Background Watermark -->
+  <div class="pk-flag-watermark" aria-hidden="true">
+    <svg class="pk-svg" viewBox="0 0 900 600" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#01411C" stop-opacity="0.95" />
+          <stop offset="100%" stop-color="#022a13" stop-opacity="0.98" />
+        </linearGradient>
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="8" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
+      <!-- Green Field -->
+      <rect width="900" height="600" fill="url(#greenGrad)"/>
+      <!-- White Pole Stripe -->
+      <rect width="200" height="600" fill="#FFFFFF" opacity="0.08"/>
+      <!-- Crescent -->
+      <path d="M 580 300 A 150 150 0 1 0 580 300 Z" fill="none"/>
+      <circle cx="560" cy="300" r="140" fill="#FFFFFF" opacity="0.06"/>
+      <circle cx="600" cy="270" r="126" fill="#01411C" opacity="0.98"/>
+      <!-- Five Pointed Star -->
+      <polygon points="585,190 598,235 645,235 607,263 621,308 585,280 549,308 563,263 525,235 572,235" fill="#FFFFFF" opacity="0.09" />
+    </svg>
+  </div>
+
+  <!-- Ambient Glow Effects -->
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+
+  <!-- Desi Quotes Marquee Ticker -->
+  <aside class="marquee-bar" aria-label="Rotating Desi Developer Status Messages">
+    <div class="marquee-content" id="marqueeTicker">
+      <span>⚡ Bijli aa gayi — commit karo jaldi!</span>
+      <span>•</span>
+      <span>🌐 Submarine cable (SMW4) theek hai aaj. Barkat hai.</span>
+      <span>•</span>
+      <span>☕ Chai pee lo — npm install chal raha hai.</span>
+      <span>•</span>
+      <span>🛡️ Adaptive Survival Mode: active.</span>
+      <span>•</span>
+      <span>📡 PTCL, StormFiber & Nayatel quirks calibrated.</span>
+      <span>•</span>
+      <span>⚡ UPS pe ho? Auto-checkpoint ho chuka hai.</span>
+      <span>•</span>
+      <span>🚀 Senior ne PR approve kiya. Subhanallah.</span>
+    </div>
+  </aside>
+
+  <!-- Navbar -->
+  <header>
+    <nav class="navbar" aria-label="Main Navigation">
+      <a href="#" class="nav-brand">
+        <div class="brand-crest">
+          <span class="crescent">☪</span>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">jugaad-code</span>
+          <span class="brand-subtitle">Pakistan Resilience Layer</span>
+        </div>
+      </a>
+
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#demo">Live Terminal</a>
+        <a href="#install">Install</a>
+        <a href="#architecture">Architecture</a>
+        <a href="https://github.com/yourhandle/jugaad-code" target="_blank" rel="noopener noreferrer" class="btn-nav-git">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero Section -->
+  <main>
+    <section class="hero-section">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Built for Pakistani Dev Conditions</span>
+      </div>
+
+      <h1 class="hero-heading">
+        Claude Code, <br>
+        <span class="urdu-accent">Raised in Pakistan.</span>
+      </h1>
+
+      <p class="hero-subtext">
+        Pakistani devs don’t have DevOps teams. <strong>They ARE the DevOps team.</strong> On a 4G hotspot. During 40°C load-shedding. When submarine cables cut without warning. 
+        <br><br>
+        <strong>jugaad-code</strong> is a silent, intelligent co-pilot for Claude Code that detects power cuts, swaps slow mirrors, and safeguards uncommitted work so you can just build.
+      </p>
+
+      <!-- Quick Installer Box -->
+      <div class="quick-install-container">
+        <div class="install-header">
+          <div class="os-tabs" role="tablist">
+            <button class="os-tab active" data-os="win" role="tab" aria-selected="true">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-13.051-1.751"/></svg>
+              <span>Windows (PowerShell)</span>
+            </button>
+            <button class="os-tab" data-os="nix" role="tab" aria-selected="false">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 7.18c.64-.78 1.08-1.86.96-2.95-1 .04-2.16.66-2.84 1.45-.6.69-1.12 1.8-1 2.87 1.11.09 2.21-.57 2.88-1.37z"/></svg>
+              <span>Linux / macOS / WSL (Bash)</span>
+            </button>
+          </div>
+          <span class="one-liner-tag">One-Command Auto Setup</span>
+        </div>
+
+        <div class="install-code-box">
+          <span class="prompt-symbol">$</span>
+          <code id="installCommand">irm https://raw.githubusercontent.com/yourhandle/jugaad-code/main/install.ps1 | iex</code>
+          <button class="btn-copy" id="btnCopyInstall" title="Copy command to clipboard">
+            <svg class="icon-copy" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+            <span class="copy-text">Copy</span>
+          </button>
+        </div>
+        <p class="install-footnote">⚡ Automatically mounts slash commands (<code>/doctor</code>, <code>/pk</code>, <code>/checkpoint</code>), configures pre/post hooks, and sets up statusline.</p>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="hero-actions">
+        <a href="#demo" class="btn-primary">
+          <span>Explore Live Interactive Demo</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a href="#features" class="btn-secondary">
+          <span>Why Pakistani Devs Need This</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- Interactive Terminal Showcase -->
+    <section class="demo-section" id="demo">
+      <div class="section-header">
+        <h2 class="section-title">Experience <span class="urdu-accent">jugaad-code</span> in Action</h2>
+        <p class="section-desc">Try out the slash commands and simulate Pakistani infrastructure disruptions in real time.</p>
+      </div>
+
+      <div class="terminal-wrapper">
+        <!-- Terminal Controls Bar -->
+        <div class="terminal-topbar">
+          <div class="terminal-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <div class="terminal-title">claude-code — ~/projects/chaicode (Pakistan Resilience Layer)</div>
+          <div class="terminal-status-badge" id="terminalLiveBadge">
+            <span class="status-indicator"></span>
+            <span id="badgeStateText">SURVIVAL: NORMAL</span>
+          </div>
+        </div>
+
+        <!-- Terminal Command Selector Buttons -->
+        <div class="terminal-command-bar">
+          <span class="cmd-label">Execute in Claude Code:</span>
+          <button class="cmd-btn active" data-cmd="doctor">/doctor</button>
+          <button class="cmd-btn" data-cmd="pkon">/pk on</button>
+          <button class="cmd-btn" data-cmd="checkpoint">/checkpoint</button>
+          <button class="cmd-btn" data-cmd="error">Simulate Error Translation</button>
+        </div>
+
+        <!-- Simulation Disaster Toggles -->
+        <div class="disaster-simulator-bar">
+          <span class="sim-label">⚡ Infrastructure Chaos Simulator:</span>
+          <button class="sim-btn" id="simPowerCut" title="Simulate AC Power Outage">
+            <span>⚡ Bijli Chali Gayi</span>
+          </button>
+          <button class="sim-btn" id="simCableCongestion" title="Simulate SMW4 Submarine Cable Degrade">
+            <span>🌊 SMW4 Cable Slowdown</span>
+          </button>
+          <button class="sim-btn" id="simCritical" title="Simulate Low Battery + Bad Net">
+            <span>🚨 12% Battery + No Net</span>
+          </button>
+          <button class="sim-btn" id="simNormal" title="Restore Normal Power & Net">
+            <span>✓ Restore Normal</span>
+          </button>
+        </div>
+
+        <!-- Terminal Screen Output -->
+        <div class="terminal-screen" id="terminalScreen">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <!-- Live Status Bar -->
+        <div class="terminal-statusbar">
+          <div class="status-left" id="terminalStatusline">
+            <span class="status-tag">[PK: NORMAL ✓]</span>
+            <span class="status-msg">"Kaam karo. Guardian jaag raha hai."</span>
+          </div>
+          <div class="status-right">
+            <span>ISP: PTCL (Islamabad)</span>
+            <span>•</span>
+            <span>Battery: 100% (AC)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Adaptive Survival Mode Cards -->
+    <section class="survival-section">
+      <div class="section-header">
+        <h2 class="section-title">Adaptive <span class="urdu-accent">Survival Mode</span></h2>
+        <p class="section-desc">jugaad-code doesn't just log errors — it dynamically modifies Claude Code's operating policies based on infrastructure health.</p>
+      </div>
+
+      <div class="survival-grid">
+        <!-- NORMAL -->
+        <div class="survival-card state-normal">
+          <div class="card-header">
+            <span class="state-icon">✓</span>
+            <div>
+              <h3>NORMAL</h3>
+              <span class="state-sub">Full Operation</span>
+            </div>
+          </div>
+          <p class="card-body">AC power is stable and submarine routes are clear. Claude Code operates without restrictions with standard registries.</p>
+          <ul class="policy-list">
+            <li>Standard package registries</li>
+            <li>Default build concurrency</li>
+            <li>Background health monitoring</li>
+          </ul>
+        </div>
+
+        <!-- NETWORK DEGRADED -->
+        <div class="survival-card state-network">
+          <div class="card-header">
+            <span class="state-icon">🌐</span>
+            <div>
+              <h3>NETWORK DEGRADED</h3>
+              <span class="state-sub">Submarine Cable Congestion</span>
+            </div>
+          </div>
+          <p class="card-body">Triggered when international gateways (SMW4/AAE-1) spike or fail while local DNS/gateway remains reachable.</p>
+          <ul class="policy-list">
+            <li>Automatic switch to Asian mirrors (npmmirror, Tsinghua)</li>
+            <li>Aggressive local package cache preference</li>
+            <li>Auto-retry transient socket timeouts</li>
+          </ul>
+        </div>
+
+        <!-- POWER UNSTABLE -->
+        <div class="survival-card state-power">
+          <div class="card-header">
+            <span class="state-icon">⚡</span>
+            <div>
+              <h3>POWER UNSTABLE</h3>
+              <span class="state-sub">Load-Shedding / On UPS</span>
+            </div>
+          </div>
+          <p class="card-body">Detected instantly when AC line drops and laptop switches to battery or inverter power.</p>
+          <ul class="policy-list">
+            <li>Immediate emergency git checkpoint</li>
+            <li>Warning before launching heavy builds</li>
+            <li>Encourage push while battery is healthy</li>
+          </ul>
+        </div>
+
+        <!-- CRITICAL -->
+        <div class="survival-card state-critical">
+          <div class="card-header">
+            <span class="state-icon">🚨</span>
+            <div>
+              <h3>CRITICAL</h3>
+              <span class="state-sub">&lt; 15% Battery + Unstable Net</span>
+            </div>
+          </div>
+          <p class="card-body">High-risk threshold where impending shutdown could destroy uncommitted work or leave locked states.</p>
+          <ul class="policy-list">
+            <li>Lock workspace protection</li>
+            <li>Force immediate git checkpoint</li>
+            <li>Prevent starting long-running commands</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Core Features Grid -->
+    <section class="features-section" id="features">
+      <div class="section-header">
+        <h2 class="section-title">Engineered for the Realities of <span class="urdu-accent">Pakistan</span></h2>
+        <p class="section-desc">Every line of jugaad-code was designed around the actual day-to-day obstacles Pakistani developers conquer.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Bijli & UPS Sensor</h3>
+          <p>Direct WMI (Windows) and psutil hooks detect the exact millisecond power disconnects, instantly staging and committing dirty files before your UPS runs dry.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📡</div>
+          <h3>Pakistani ISP Fingerprinting</h3>
+          <p>Knows the quirks of PTCL (9pm GitHub slowdowns), StormFiber (peak evening API spikes), Nayatel, Jazz, and Zong hotspot data thresholds.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🔄</div>
+          <h3>Smart Asian Mirror Switcher</h3>
+          <p>When US/European CDNs crawl through damaged submarine cables, npm and pip automatically reroute to high-speed Asian mirror networks.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">💬</div>
+          <h3>Human Roman Urdu Errors</h3>
+          <p>Cryptic <code>ECONNREFUSED</code> or <code>ETIMEDOUT</code> errors get translated into clear explanations: <em>"Yeh aapka code nahi hai. Server ne mana kiya hai."</em></p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🎨</div>
+          <h3>Pakistan Green & White Theme</h3>
+          <p>Activate Pakistan Mode and transform Claude Code’s interface into an emerald green and crisp white aesthetic with live statusline telemetry.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🛡️</div>
+          <h3>Detached Silent Guardian</h3>
+          <p>Runs quietly in the background, writing zero-latency state caches so Claude Code hooks execute in &lt;5ms without blocking you.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Installation & Setup Guide -->
+    <section class="install-section" id="install">
+      <div class="section-header">
+        <h2 class="section-title">Get Started in <span class="urdu-accent">60 Seconds</span></h2>
+        <p class="section-desc">One command sets up all hooks, slash commands, themes, and configuration files automatically.</p>
+      </div>
+
+      <div class="install-steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <h3>Run One-Command Installer</h3>
+          <p>Paste the installation command in your terminal. It copies all components and merges into your Claude Code settings.</p>
+          <div class="mini-code">
+            <code>irm https://raw.githubusercontent.com/yourhandle/jugaad-code/main/install.ps1 | iex</code>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <h3>Open Claude Code</h3>
+          <p>Launch Claude Code in any repository on your computer as you normally do.</p>
+          <div class="mini-code">
+            <code>claude</code>
+          </div>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <h3>Run /doctor or /pk on</h3>
+          <p>Check your environment health or activate full Pakistan Mode with mirror switching and green theme.</p>
+          <div class="mini-code">
+            <code>/doctor</code>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Architecture Breakdown -->
+    <section class="architecture-section" id="architecture">
+      <div class="section-header">
+        <h2 class="section-title">How <span class="urdu-accent">jugaad-code</span> Works Under the Hood</h2>
+        <p class="section-desc">Zero external cloud dependencies. Operates locally on your machine with lightweight caching.</p>
+      </div>
+
+      <div class="arch-box">
+        <div class="arch-flow">
+          <div class="arch-node">
+            <span class="node-badge">Daemon</span>
+            <h4>guardian.py</h4>
+            <p>Background watcher monitoring power & network layers every 60s.</p>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-node highlight">
+            <span class="node-badge">State Cache</span>
+            <h4>~/.jugaad-code/state.json</h4>
+            <p>Sub-millisecond state cache read by Claude Code hooks & statusline.</p>
+          </div>
+          <div class="arch-arrow">➔</div>
+          <div class="arch-node">
+            <span class="node-badge">Claude Code</span>
+            <h4>Hooks & Slash Commands</h4>
+            <p>Pre-tool checkpoints, error translations, /doctor, and /pk commands.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <div class="footer-logo">
+          <span class="footer-crescent">☪</span>
+          <span class="footer-title">jugaad-code</span>
+        </div>
+        <p class="footer-tagline">"Pakistani devs don't have DevOps teams. They ARE the DevOps team."</p>
+      </div>
+      <div class="footer-right">
+        <p>Built with ❤️ in Pakistan for developers everywhere facing infrastructure chaos.</p>
+        <p class="copyright">Open Source • Theek hai. Kaam karo.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,10 +1,10 @@
-# jugaadi-claude
+# jugaad-code
 
 ### Claude Code, raised in Pakistan.
 
 > "Pakistani devs don't have DevOps teams.
 > They ARE the DevOps team. On a hotspot. During load-shedding.
-> jugaadi-claude handles the infrastructure chaos so you can just write code."
+> jugaad-code handles the infrastructure chaos so you can just write code."
 
 ---
 
@@ -21,7 +21,7 @@ Pakistani developers lose hours every day to:
 
 ## The Solution
 
-jugaadi-claude is a resilience layer for Claude Code that:
+jugaad-code is a resilience layer for Claude Code that:
 
 | Feature | What it does |
 |--------|-------------|
@@ -63,24 +63,24 @@ CRITICAL
 
 ### Windows (PowerShell):
 ```powershell
-git clone https://github.com/yourhandle/jugaadi-claude
-cd jugaadi-claude
+git clone https://github.com/yourhandle/jugaad-code
+cd jugaad-code
 .\install.ps1
 ```
 
 The installer copies the slash commands and hooks to `~/.claude/`, sets the
-`JUGAADI_CLAUDE_SCRIPTS` environment variable, and merges the hook + statusline
+`JUGAAD_CODE_SCRIPTS` environment variable, and merges the hook + statusline
 config into `~/.claude/settings.json` (existing keys are preserved).
 
 ### Linux / macOS / WSL:
 ```bash
-git clone https://github.com/yourhandle/jugaadi-claude
-cd jugaadi-claude
+git clone https://github.com/yourhandle/jugaad-code
+cd jugaad-code
 bash install.sh
 ```
 
 The installer copies the slash commands and hooks to `~/.claude/`, adds
-`JUGAADI_CLAUDE_SCRIPTS` to your shell rc file, and merges the hook +
+`JUGAAD_CODE_SCRIPTS` to your shell rc file, and merges the hook +
 statusline config into `~/.claude/settings.json` (existing keys are
 preserved).
 
@@ -109,9 +109,9 @@ files are picked up.
 ### Thinking messages
 
 Claude Code's built-in thinking text is not customizable (no setting or hook
-exists for it). jugaadi-claude substitutes the closest supported things:
+exists for it). jugaad-code substitutes the closest supported things:
 
-- the hook spinner text becomes "jugaadi soch raha hai..." while the pre-tool
+- the hook spinner text becomes "jugaad soch raha hai..." while the pre-tool
   hook runs (`statusMessage`)
 - a rotating Roman Urdu line is printed before each tool call
 - the statusline shows the survival state and a rotating desi message
@@ -122,7 +122,7 @@ exists for it). jugaadi-claude substitutes the closest supported things:
 
 ```
 ══════════════════════════════════════
-  jugaadi-claude Developer Health Report
+  jugaad-code Developer Health Report
 ══════════════════════════════════════
 POWER
 Status   : On Battery/UPS
@@ -162,7 +162,7 @@ Kaam karo lekin push kar do pehle.
 ## Architecture & Structure
 
 ```
-jugaadi-claude/
+jugaad-code/
 ├── README.md
 ├── install.ps1                 # one-command installer (Windows)
 ├── install.sh                  # one-command installer (Linux / macOS / WSL)
@@ -187,7 +187,7 @@ jugaadi-claude/
     └── errors.py               # pakistan-aware error translations
 ```
 
-The guardian writes its pidfile, log and state cache to `~/.jugaadi-claude/`.
+The guardian writes its pidfile, log and state cache to `~/.jugaad-code/`.
 Hooks and the statusline read that cache, so they stay fast and never stall a
 tool call on a network probe.
 
@@ -196,6 +196,6 @@ tool call on a network probe.
 ## Built for Pakistan. Ready for the world.
 
 Same infrastructure chaos exists in India, Bangladesh, Nigeria, Egypt,
-Indonesia. jugaadi-claude is the proving ground. The product scales globally.
+Indonesia. jugaad-code is the proving ground. The product scales globally.
 
 Theek hai.

@@ -15,7 +15,7 @@ Steps:
 
 ```
 ══════════════════════════════════════
-  jugaadi-claude Developer Health Report
+  jugaad-code Developer Health Report
 ══════════════════════════════════════
 POWER
 Status   : [AC Connected / On Battery/UPS]

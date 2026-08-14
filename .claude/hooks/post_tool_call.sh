@@ -6,7 +6,7 @@ TOOL_NAME=$1
 EXIT_CODE=$2
 OUTPUT=$3
 
-SCRIPT_DIR="${JUGAADI_CLAUDE_SCRIPTS:-$(cd "$(dirname "$0")/../../scripts" && pwd)}"
+SCRIPT_DIR="${JUGAAD_CODE_SCRIPTS:-${JUGAADI_CLAUDE_SCRIPTS:-$(cd "$(dirname "$0")/../../scripts" && pwd)}}"
 
 if command -v python3 &>/dev/null; then
     PY="python3"
