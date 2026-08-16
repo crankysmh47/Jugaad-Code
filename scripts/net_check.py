@@ -7,6 +7,7 @@ import sys
 import time
 import urllib.error
 import urllib.request
+from concurrent.futures import ThreadPoolExecutor
 
 ENDPOINTS = {
     "github.com": {
@@ -49,7 +50,6 @@ PK_MIRRORS = {
 def dns_resolve(host, timeout=3):
     try:
         start = time.time()
-        socket.setdefaulttimeout(timeout)
         socket.gethostbyname(host)
         return round((time.time() - start) * 1000, 1)
     except:
@@ -94,6 +94,7 @@ def ttfb(url, timeout=5):
         )
         resp = urllib.request.urlopen(req, timeout=timeout)
         resp.read(1)
+        resp.close()
         return round((time.time() - start) * 1000, 1)
     except urllib.error.HTTPError:
         # Server reached and responded with HTTP status (e.g. 403/404)
@@ -101,61 +102,78 @@ def ttfb(url, timeout=5):
     except Exception:
         return None
 
+def probe(host, meta):
+    """Probe one endpoint; returns (host, result_dict, kind)."""
+    if meta.get("kind") == "dns_resolver":
+        # DNS resolvers get a real UDP 53 query, not a TCP 443 probe
+        dns_ms = dns_query_ms(host)
+        return host, {
+            "dns_ms": dns_ms,
+            "tcp_ms": None,
+            "ttfb_ms": None,
+            "status": "ok" if dns_ms is not None else "dns_fail",
+            "cable": meta["cable"],
+            "critical": meta["critical"]
+        }, "local"
+
+    dns_ms = dns_resolve(host)
+    tcp_ms = tcp_connect(host) if dns_ms else None
+    ttfb_ms = ttfb(meta["url"]) if tcp_ms else None
+
+    status = "ok"
+    if dns_ms is None:
+        status = "dns_fail"
+    elif tcp_ms is None:
+        status = "tcp_fail"
+    elif ttfb_ms is None or ttfb_ms > 3000:
+        status = "slow"
+
+    return host, {
+        "dns_ms": dns_ms,
+        "tcp_ms": tcp_ms,
+        "ttfb_ms": ttfb_ms,
+        "status": status,
+        "cable": meta["cable"],
+        "critical": meta["critical"]
+    }, "international"
+
 def diagnose():
     results = {}
     failed_international = 0
     failed_local = 0
     total_international = 0
 
-    for host, meta in ENDPOINTS.items():
-        # DNS resolvers get a real UDP 53 query, not a TCP 443 probe
-        if meta.get("kind") == "dns_resolver":
-            dns_ms = dns_query_ms(host)
-            results[host] = {
-                "dns_ms": dns_ms,
-                "tcp_ms": None,
-                "ttfb_ms": None,
-                "status": "ok" if dns_ms is not None else "dns_fail",
-                "cable": meta["cable"],
-                "critical": meta["critical"]
-            }
-            if dns_ms is None:
-                failed_local += 1
-            continue
+    # Probe all endpoints in parallel so the whole check finishes in the time
+    # of the slowest single endpoint instead of the sum of all of them.
+    with ThreadPoolExecutor(max_workers=len(ENDPOINTS)) as executor:
+        futures = [
+            executor.submit(probe, host, meta) for host, meta in ENDPOINTS.items()
+        ]
+        for future in futures:
+            host, res, kind = future.result()
+            results[host] = res
+            if kind == "local":
+                if res["status"] != "ok":
+                    failed_local += 1
+            else:
+                total_international += 1
+                if res["status"] != "ok":
+                    failed_international += 1
 
-        total_international += 1
-
-        dns_ms = dns_resolve(host)
-        tcp_ms = tcp_connect(host) if dns_ms else None
-        ttfb_ms = ttfb(meta["url"]) if tcp_ms else None
-
-        status = "ok"
-        if dns_ms is None:
-            status = "dns_fail"
-            failed_international += 1
-        elif tcp_ms is None:
-            status = "tcp_fail"
-            failed_international += 1
-        elif ttfb_ms is None or ttfb_ms > 3000:
-            status = "slow"
-            failed_international += 1
-
-        results[host] = {
-            "dns_ms": dns_ms,
-            "tcp_ms": tcp_ms,
-            "ttfb_ms": ttfb_ms,
-            "status": status,
-            "cable": meta["cable"],
-            "critical": meta["critical"]
-        }
-
-    # Classify root cause
-    if failed_local > 0:
+    # Classify root cause. Order matters: a total blackout (international down
+    # AND resolvers unreachable) is a local problem; resolvers unreachable
+    # while international routes work is a local DNS problem; international
+    # failures with working resolvers point at the submarine cables / ISP.
+    if failed_local > 0 and failed_international == 0:
         diagnosis = "LOCAL_NETWORK"
-        recommendation = "Check your WiFi/router. Problem is before your ISP."
+        recommendation = "Local DNS resolvers unreachable but international routes look fine. Check your WiFi/router and DNS settings."
     elif failed_international == total_international and total_international > 0:
-        diagnosis = "SUBMARINE_CABLE"
-        recommendation = "Likely SMW4/AAE-1 congestion. Affects all Pakistani ISPs. Use Asian mirrors."
+        if failed_local > 0:
+            diagnosis = "LOCAL_NETWORK"
+            recommendation = "Everything is unreachable. Check your WiFi/router first — the problem is before your ISP."
+        else:
+            diagnosis = "SUBMARINE_CABLE"
+            recommendation = "Likely SMW4/AAE-1 congestion. Affects all Pakistani ISPs. Use Asian mirrors."
     elif failed_international > 0:
         diagnosis = "ISP_ROUTING"
         recommendation = "Partial international routing issue. Your ISP may have asymmetric congestion."

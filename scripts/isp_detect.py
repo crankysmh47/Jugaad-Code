@@ -71,7 +71,7 @@ ISP_QUIRKS = {
 def detect_isp():
     endpoints = [
         ("https://ipapi.co/json/", lambda d: (d.get("org", ""), d.get("isp", ""), d.get("city", "Unknown"), d.get("country_name", "Unknown"), d.get("ip", "Unknown"))),
-        ("http://ip-api.com/json/", lambda d: (d.get("org", ""), d.get("isp", ""), d.get("city", "Unknown"), d.get("country", "Unknown"), d.get("query", "Unknown"))),
+        ("https://ip-api.com/json/", lambda d: (d.get("org", ""), d.get("isp", ""), d.get("city", "Unknown"), d.get("country", "Unknown"), d.get("query", "Unknown"))),
         ("https://ipinfo.io/json", lambda d: (d.get("org", ""), d.get("org", ""), d.get("city", "Unknown"), d.get("country", "Unknown"), d.get("ip", "Unknown")))
     ]
 

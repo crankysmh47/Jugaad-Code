@@ -58,7 +58,5 @@ if __name__ == "__main__":
     if result:
         print(result)
         sys.exit(0)
-    else:
-        print(f"[jugaad-code] Kuch toh gadbad hai: {error}")
     # No known pattern: stay silent so callers (hooks) can stay quiet too
     sys.exit(1)

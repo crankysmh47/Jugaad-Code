@@ -3,6 +3,11 @@
 # Before every Bash/PowerShell tool call: warn on degraded states,
 # auto-checkpoint on low battery, and drop one rotating desi line.
 SCRIPT_DIR="${JUGAAD_CODE_SCRIPTS:-${JUGAADI_CLAUDE_SCRIPTS:-$(cd "$(dirname "$0")/../../scripts" && pwd)}}"
+# Installed layout fallback (these hooks are normally wired as Python hooks,
+# but if used from ~/.claude/hooks, resolve the installed scripts instead).
+if [ ! -f "$SCRIPT_DIR/cache_reader.py" ] && [ -d "$HOME/.jugaad-code/scripts" ]; then
+    SCRIPT_DIR="$HOME/.jugaad-code/scripts"
+fi
 
 if command -v python3 &>/dev/null; then
     PY="python3"

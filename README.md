@@ -22,7 +22,7 @@ code instead of fighting infrastructure.
 | Auto-checkpoint | Silent `[PK-auto]` git commits every 5 minutes while the working tree is dirty |
 | Net Diagnosis | Layered DNS → TCP → TTFB checks per endpoint (GitHub, npm, PyPI, Claude API). DNS resolvers (1.1.1.1, 8.8.8.8) are probed with real UDP 53 DNS queries, not fake TCP checks. Classifies the root cause as LOCAL_NETWORK, SUBMARINE_CABLE, or ISP_ROUTING |
 | ISP Awareness | Fingerprints your ISP from your public IP and maps known quirks: PTCL, StormFiber, Nayatel, Jazz, Zong, Transworld — each with known issues and recommended mirrors/DNS |
-| Mirror Switch | Auto-switches npm → npmmirror and pip → Tsinghua TUNA the moment international routing degrades |
+| Mirror Switch | Auto-switches npm → npmmirror and pip → Tsinghua TUNA the moment international routing degrades — and restores whatever registries you had before (official or custom) once the route recovers |
 | Guardian Daemon | Background watcher (60s cycles): power checks, auto-checkpoints, network diagnosis, mirror switching, and survival-state tracking. Single-instance, writes its pidfile, log and state cache to `~/.jugaad-code/` |
 | Detached Boot | `guardian_boot.py` spawns the guardian as a detached process that survives session exits, and a SessionStart hook auto-boots it every time Claude Code starts — no OS-level startup script needed |
 | Survival Mode | Adaptive behavior across four states: NORMAL, NETWORK DEGRADED, POWER UNSTABLE, CRITICAL (details below) |
@@ -56,7 +56,8 @@ CRITICAL
 - **POWER UNSTABLE** — workspace checkpoint on AC loss, warn before long
   builds/downloads, encourage pushing while connectivity is healthy.
 - **CRITICAL** — battery under 15% with degraded network: finish the current
-  edit, checkpoint now, push when the connection recovers.
+  edit, checkpoint now, push when the connection recovers (the guardian
+  suggests it — the push itself is manual).
 
 ---
 
@@ -76,8 +77,10 @@ The installer:
 - copies the slash commands to `~/.claude/commands/`
 - sets the `JUGAAD_CODE_SCRIPTS` and `JUGAADI_CLAUDE_SCRIPTS` environment
   variables
-- wires the hooks (with the `jugaad soch raha hai...` spinner) and the
-  statusline into `~/.claude/settings.json`, preserving any existing keys
+- wires the SessionStart guardian boot, the hooks (with the
+  `jugaad soch raha hai...` spinner) and the statusline into
+  `~/.claude/settings.json` — merging with any existing keys instead of
+  overwriting them, and backing up the file first if it isn't valid JSON
 
 ### Linux / macOS / WSL
 
@@ -192,6 +195,7 @@ SessionStart hook ──► guardian_boot.py ──► guardian.py (detached dae
                                                  ├─ power check (bijli) ──► emergency checkpoint
                                                  ├─ auto-checkpoint every 5 min if dirty
                                                  ├─ net_check every 5 cycles ──► auto mirror switch
+                                                 │    └─ auto-restore registries when net recovers
                                                  └─ writes ~/.jugaad-code/state.json
 
 PreToolUse hook ──► pre_tool_hook.py   (state warnings, low-battery
@@ -202,6 +206,8 @@ statusLine ───────► statusline.py      ([PK: STATE] + rotating m
 ```
 
 The guardian writes its pidfile, log, and state cache to `~/.jugaad-code/`.
+Git checkpoints target the project it was spawned from
+(`CLAUDE_PROJECT_DIR` at boot), so it never commits to the wrong repo.
 Hooks and the statusline read that cache (freshness window of ~2 minutes)
 instead of running network probes on every tool call, so they never stall
 your work.
@@ -215,7 +221,6 @@ jugaad-code/
 ├── README.md
 ├── install.ps1                 # one-command installer (Windows)
 ├── install.sh                  # one-command installer (Linux / macOS / WSL)
-├── plan.md                     # build plan + status
 ├── .claude/
 │   ├── settings.json           # SessionStart + Pre/PostToolUse + statusline wiring
 │   ├── commands/               # /doctor, /pk, /checkpoint

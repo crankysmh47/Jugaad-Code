@@ -65,8 +65,11 @@ def main():
     else:
         kwargs["start_new_session"] = True
 
-    subprocess.Popen([sys.executable, GUARDIAN], **kwargs)
-    print("guardian started (detached)")
+    # Tell the guardian which project to checkpoint. Hooks run under bash even
+    # on Windows, so CLAUDE_PROJECT_DIR is normally available here.
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    subprocess.Popen([sys.executable, GUARDIAN, project_dir], **kwargs)
+    print(f"guardian started (detached, project: {project_dir})")
 
 
 if __name__ == "__main__":

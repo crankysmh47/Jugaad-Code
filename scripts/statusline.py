@@ -16,8 +16,16 @@ if hasattr(sys.stdout, "reconfigure"):
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(SCRIPT_DIR))
 
-from scripts.cache_reader import get_cached_state
-from ui.messages import get_message
+try:
+    from scripts.cache_reader import get_cached_state
+except ImportError:
+    from cache_reader import get_cached_state
+
+try:
+    from ui.messages import get_message
+except ImportError:
+    def get_message():
+        return "Kaam karo. Guardian jaag raha hai."
 
 def render_statusline():
     cache = get_cached_state()

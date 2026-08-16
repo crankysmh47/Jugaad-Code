@@ -54,10 +54,13 @@ done
 export JUGAAD_CODE_SCRIPTS="$APP_SCRIPTS_DIR"
 export JUGAADI_CLAUDE_SCRIPTS="$APP_SCRIPTS_DIR"
 
-# Wire hooks and statusline into settings.json
+# Wire hooks and statusline into settings.json (merge, never clobber)
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 $PY - << EOF
-import json, os
+import json
+import os
+import shutil
+import sys
 
 settings_path = "$SETTINGS_FILE"
 settings = {}
@@ -65,43 +68,64 @@ if os.path.exists(settings_path):
     try:
         with open(settings_path, "r", encoding="utf-8") as f:
             settings = json.load(f)
-    except Exception:
-        settings = {}
+    except Exception as e:
+        shutil.copy2(settings_path, settings_path + ".bak")
+        print("[Error] ~/.claude/settings.json is not valid JSON.", file=sys.stderr)
+        print(f"        Backed it up to {settings_path}.bak — fix it and re-run.", file=sys.stderr)
+        sys.exit(1)
 
-settings["hooks"] = {
-    "PreToolUse": [
-        {
-            "matcher": "Bash|PowerShell",
-            "hooks": [
-                {
-                    "type": "command",
-                    "command": 'python "\${JUGAAD_CODE_SCRIPTS}/pre_tool_hook.py"',
-                    "timeout": 15,
-                    "statusMessage": "jugaad soch raha hai..."
-                }
-            ]
-        }
-    ],
-    "PostToolUse": [
-        {
-            "matcher": "Bash|PowerShell",
-            "hooks": [
-                {
-                    "type": "command",
-                    "command": 'python "\${JUGAAD_CODE_SCRIPTS}/post_tool_hook.py"',
-                    "timeout": 15
-                }
-            ]
-        }
-    ]
-}
+if not isinstance(settings, dict):
+    settings = {}
 
-settings["statusLine"] = {
-    "type": "command",
-    "command": 'python "\${JUGAAD_CODE_SCRIPTS}/statusline.py"',
-    "padding": 1,
-    "refreshInterval": 30
-}
+PYTHON_BIN = "$PY"
+# Bash-style fallback chain: env vars set by the installer, else installed path.
+# Claude Code runs hook commands through bash even on Windows, so this expands.
+SCRIPTS_REF = '"\${JUGAAD_CODE_SCRIPTS:-\${JUGAADI_CLAUDE_SCRIPTS:-\$HOME/.jugaad-code/scripts}}"'
+
+
+def ensure_hook(event, matcher, command, timeout, status_message=None):
+    hooks = settings.setdefault("hooks", {})
+    if not isinstance(hooks, dict):
+        hooks = {}
+        settings["hooks"] = hooks
+    groups = hooks.setdefault(event, [])
+    if not isinstance(groups, list):
+        groups = []
+        hooks[event] = groups
+    script_name = command.rsplit("/", 1)[-1]
+    for group in groups:
+        for h in group.get("hooks", []):
+            if script_name in h.get("command", ""):
+                return  # already wired by a previous install
+    entry = {"type": "command", "command": command, "timeout": timeout}
+    if status_message:
+        entry["statusMessage"] = status_message
+    groups.append({"matcher": matcher, "hooks": [entry]})
+
+
+ensure_hook(
+    "SessionStart", "startup",
+    PYTHON_BIN + " " + SCRIPTS_REF + "/guardian_boot.py", 10,
+)
+ensure_hook(
+    "PreToolUse", "Bash|PowerShell",
+    PYTHON_BIN + " " + SCRIPTS_REF + "/pre_tool_hook.py", 15,
+    status_message="jugaad soch raha hai...",
+)
+ensure_hook(
+    "PostToolUse", "Bash|PowerShell",
+    PYTHON_BIN + " " + SCRIPTS_REF + "/post_tool_hook.py", 15,
+)
+
+statusline_cmd = PYTHON_BIN + " " + SCRIPTS_REF + "/statusline.py"
+current_status = settings.get("statusLine")
+if not (isinstance(current_status, dict) and "statusline.py" in str(current_status.get("command", ""))):
+    settings["statusLine"] = {
+        "type": "command",
+        "command": statusline_cmd,
+        "padding": 1,
+        "refreshInterval": 30,
+    }
 
 with open(settings_path, "w", encoding="utf-8") as f:
     json.dump(settings, f, indent=2)

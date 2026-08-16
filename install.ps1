@@ -54,52 +54,67 @@ if (Test-Path ".claude\commands") {
 $env:JUGAAD_CODE_SCRIPTS = $appScriptsDir
 $env:JUGAADI_CLAUDE_SCRIPTS = $appScriptsDir
 
-# Wire hooks, statusline, and startup into user settings.json
+# Wire hooks, statusline, and startup into user settings.json (merge, never clobber)
 $settingsPath = Join-Path $claudeDir "settings.json"
 $settings = @{}
 if (Test-Path $settingsPath) {
     try {
         $settings = Get-Content $settingsPath -Raw | ConvertFrom-Json -AsHashtable
     } catch {
-        $settings = @{}
+        Copy-Item $settingsPath "$settingsPath.bak" -Force
+        Write-Host "[Error] ~/.claude/settings.json is not valid JSON." -ForegroundColor Red
+        Write-Host "        Backed it up to settings.json.bak — fix it and re-run." -ForegroundColor Red
+        exit 1
     }
 }
 
 if ($null -eq $settings) { $settings = @{} }
 
-$settings["hooks"] = @{
-    PreToolUse = @(
-        @{
-            matcher = "Bash|PowerShell"
-            hooks = @(
-                @{
-                    type = "command"
-                    command = 'python "${JUGAAD_CODE_SCRIPTS}/pre_tool_hook.py"'
-                    timeout = 15
-                    statusMessage = "jugaad soch raha hai..."
-                }
-            )
-        }
+# Bash-style fallback chain; Claude Code runs hook commands through bash even
+# on Windows, so these expand. Single-quoted PS strings keep the $ literally.
+$scriptsRef = '"${JUGAAD_CODE_SCRIPTS:-${JUGAADI_CLAUDE_SCRIPTS:-$HOME/.jugaad-code/scripts}}"'
+
+function Add-JugaadHook {
+    param(
+        [hashtable]$Settings,
+        [string]$Event,
+        [string]$Matcher,
+        [string]$Command,
+        [int]$Timeout,
+        [string]$StatusMessage = ""
     )
-    PostToolUse = @(
-        @{
-            matcher = "Bash|PowerShell"
-            hooks = @(
-                @{
-                    type = "command"
-                    command = 'python "${JUGAAD_CODE_SCRIPTS}/post_tool_hook.py"'
-                    timeout = 15
-                }
-            )
+    if (-not $Settings.ContainsKey("hooks")) { $Settings["hooks"] = @{} }
+    $hooks = $Settings["hooks"]
+    if (-not $hooks.ContainsKey($Event)) { $hooks[$Event] = @() }
+    $groups = @($hooks[$Event])
+    $scriptName = ($Command -split "/")[-1]
+    foreach ($group in $groups) {
+        foreach ($h in @($group.hooks)) {
+            if ($h.command -and $h.command.Contains($scriptName)) { return }
         }
-    )
+    }
+    $hookEntry = @{ type = "command"; command = $Command; timeout = $Timeout }
+    if ($StatusMessage) { $hookEntry["statusMessage"] = $StatusMessage }
+    $groups += @{ matcher = $Matcher; hooks = @($hookEntry) }
+    $hooks[$Event] = $groups
 }
 
-$settings["statusLine"] = @{
-    type = "command"
-    command = 'python "${JUGAAD_CODE_SCRIPTS}/statusline.py"'
-    padding = 1
-    refreshInterval = 30
+Add-JugaadHook -Settings $settings -Event "SessionStart" -Matcher "startup" `
+    -Command "python $scriptsRef/guardian_boot.py" -Timeout 10
+Add-JugaadHook -Settings $settings -Event "PreToolUse" -Matcher "Bash|PowerShell" `
+    -Command "python $scriptsRef/pre_tool_hook.py" -Timeout 15 -StatusMessage "jugaad soch raha hai..."
+Add-JugaadHook -Settings $settings -Event "PostToolUse" -Matcher "Bash|PowerShell" `
+    -Command "python $scriptsRef/post_tool_hook.py" -Timeout 15
+
+$statuslineCmd = "python $scriptsRef/statusline.py"
+$currentStatus = $settings["statusLine"]
+if (-not ($currentStatus -is [System.Collections.IDictionary] -and $currentStatus["command"] -match "statusline\.py")) {
+    $settings["statusLine"] = @{
+        type = "command"
+        command = $statuslineCmd
+        padding = 1
+        refreshInterval = 30
+    }
 }
 
 $settings | ConvertTo-Json -Depth 20 | Set-Content -Path $settingsPath -Encoding UTF8

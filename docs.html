@@ -127,7 +127,7 @@
         <h2 class="section-heading">Hook Architecture</h2>
         <p>Claude Code executes cross-platform Python hooks before and after tool calls:</p>
         <ul>
-          <li><strong>Pre-Tool Hook</strong> (<code>scripts/pre_tool_hook.py</code>): Reads state cache in &lt;5ms. Warns on degraded infrastructure and auto-commits when battery is low.</li>
+          <li><strong>Pre-Tool Hook</strong> (<code>scripts/pre_tool_hook.py</code>): Reads the state cache instead of probing the network. Warns on degraded infrastructure and auto-commits when battery is low.</li>
           <li><strong>Post-Tool Hook</strong> (<code>scripts/post_tool_hook.py</code>): Intercepts failures (<code>ECONNREFUSED</code>, timeouts) and translates them to human Roman Urdu explanations.</li>
           <li><strong>Statusline</strong> (<code>scripts/statusline.py</code>): Dynamically injects the current survival state and rotating desi humor into Claude Code’s status bar.</li>
         </ul>
