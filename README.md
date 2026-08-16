@@ -246,6 +246,24 @@ jugaad-code/
 
 ---
 
+## License
+
+jugaad-code is released under the [Noncommercial Source License v1.0](LICENSE).
+
+- **Non-commercial use** — personal, hobby, educational, academic,
+  research, and non-profit use: free, including free redistribution.
+- **Commercial use** — use by a business or any revenue-generating
+  organization (even internally), or any use that generates revenue,
+  requires **prior written permission** from the author, with fair
+  compensation for the author (a license fee or a share of revenue).
+  Contact [crankysmh47](mailto:annankhan741@gmail.com) for a commercial
+  license.
+
+The license text is generic — reuse it in other projects by updating the
+copyright line in `LICENSE` to your name and year.
+
+---
+
 ## Built for Pakistan. Ready for the world.
 
 The same infrastructure chaos exists in India, Bangladesh, Nigeria, Egypt,
